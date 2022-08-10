@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atividade 01</title>
+</head>
+
+<body>
+
+    <div>
+        <div>
+            <ol type="1">
+                <h2>CONCEITOS BÁSICOS</h2>
+
+                <li>Escreva um programa que possua uma variável com um número ponto flutuante e mostre seu antecessor e
+                    sucessor, ambos inteiros.</li>
+                <div id="q1-div">
+                    <input id="q1" step="0.01" type="number">
+                    <button onclick="q1()">Ler</button>
+                    <a></a>
+                </div>
+                <hr>
+                <li>Escreva um programa para converter de real para bitcoin e exibir para o usuário a resposta final.
+                    Considere até 8 casas decimais.</li>
+                <div id="q2-div">
+                    <input id="q2" step="0.01" type="number">
+                    <button onclick="q2()">Converter</button>
+                    <a></a>
+                </div>
+
+                <h2>ESTRUTURAS DE SELEÇÃO</h2>
+
+                <li>Escreva um programa que leia três valores inteiros e apresente o maior e o menor dos valores lidos
+                </li>
+                <div id="q3-div">
+                    <input type="number" class="q3" id="q3-1">
+                    <input type="number" class="q3" id="q3-2">
+                    <input type="number" class="q3" id="q3-3">
+                    <button onclick="q3()">Calcular</button>
+                </div>
+                <hr>
+                <li>Escreva um programa que apresente o mês por extenso, a partir de um número digitado pelo usuário
+                    (entre 1 e 12) e a quantidade de dias do mês.</li>
+                <div id="q4-div">
+                    <input type="number" id="q4" min="1" max="12">
+                    <button onclick="q4()">Calcular</button>
+                </div>
+
+                <h2>ESTRUTURAS DE REPETIÇÃO</h2>
+                <li>Escreva um programa que imprima os números inteiros entre dois valores lidos.</li>
+                <div id="q5-div">
+                    <input type="number" class="q5" id="q5-1">
+                    <input type="number" class="q5" id="q5-2">
+                    <button onclick="q5()">Calcular</button>
+                </div>
+                <hr>
+                <li>Escreva um programa que leia uma sequência de números inteiros terminada por –1 e imprima na tela a
+                    soma e a média aritmética e o desvio padrão destes números. Obs: o
+                    valor –1 é somente um terminador e não deve ser considerado nos cálculos.</li>
+                <div id="q6-div">
+                    <input type="text" class="q6" id="q6-1">
+                    <input type="text" class="q6" id="q6-2">
+                    <input type="text" class="q6" id="q6-3">
+                    <button onclick="q6()">Calcular</button>
+                </div>
+
+                <h2>VETORES E STRINGS</h2>
+                <li>Escreva um programa que leia um vetor de inteiros de 5 posições e apresente-o na tela
+                    de forma crescente e decrescente.</li>
+                <div id="q7-div">
+                    <input type="number" class="q7" id="q7-1">
+                    <input type="number" class="q7" id="q7-2">
+                    <input type="number" class="q7" id="q7-3">
+                    <input type="number" class="q7" id="q7-4">
+                    <input type="number" class="q7" id="q7-5">
+                    <button onclick="q7()">Calcular</button>
+                </div>
+
+                <hr>
+                <li>Escreva um programa que leia um texto pelo teclado e remova todas as suas vogais
+                    acentuadas por não acentuadas. Exiba a string resultante.</li>
+                <div id="q8-div">
+                    <input type="text" class="q8" id="q8">
+                    <button onclick="q8()">Calcular</button>
+                </div>
+
+                <h2>MODULARIZAÇÃO</h2>
+                <li>Escreva uma função que dados 2 valores reais v e t. Onde v é um valor em R$ e t é a
+                    taxa de juros em %. Retorne um array de 12 posições meses representando a taxa
+                    aplicada como juros compostos ao valor v mês a mês.</li>
+                Ex: v = 1000,00 e t = 1%. Retornar: 1.010 – 1.020,10 - 1.030,30 - ... - 1.126,82
+                <li>Faça uma função que recebe por parâmetro uma medida de tempo expressa em
+                    milissegundos e retorna esse tempo dias, horas, minutos e segundos no formato: “Dias
+                    hh:mm:ss”.</li>
+                <div id="q10-div">
+                    <input type="number" class="q10" id="q10">
+                    <button onclick="q10()">Calcular</button>
+                </div>
+
+            </ol>
+        </div>
+    </div>
+
+</body>
+<script>
+    q1 = function () {
+        input = parseInt(getInput('q1'))
+
+        prev = input - 1
+        next = input + 1
+
+        node = document.createTextNode("Anterior: " + prev + " Proximo: " + next);
+        insertHtml('q1-div', node)
+    }
+
+    q2 = function () {
+        input = getInput('q2')
+        bitcoin = (input / 118616)
+
+        node = document.createTextNode("Valor Bitcoin: " + bitcoin.toFixed(8));
+        insertHtml('q2-div', node)
+    }
+
+    q3 = function () {
+        numbers = []
+        inputs = document.querySelectorAll('.q3')
+        for (let i = 1; i < (inputs.length + 1); i++) {
+            numbers.push(parseInt(getInput('q3-' + i)))
+        }
+
+        node = document.createTextNode("Maior Número: " + Math.max.apply(null, numbers) + " Menor Número: " + Math.min.apply(null, numbers));
+        insertHtml('q3-div', node)
+    }
+
+    q4 = function () {
+        input = parseInt(getInput('q4'))
+        date = new Date(2022, (input - 1), 01)
+        month = date.toLocaleString('default', { month: 'long' })
+
+        if (input == 1 || input == 3 || input == 5 || input == 7 || input == 8 || input == 10 || input == 12) {
+            days = 31
+        } else if (input == 2) {
+            days = 28
+        } else {
+            days = 30
+        }
+
+        node = document.createTextNode("Mês: " + month + " Dias: " + days)
+        insertHtml('q4-div', node)
+
+    }
+
+    q5 = function () {
+        numbers = []
+        inputs = document.querySelectorAll('.q5')
+        for (let i = 1; i < (inputs.length + 1); i++) {
+            numbers.push(parseInt(getInput('q5-' + i)))
+        }
+
+        for (let i = Math.min.apply(null, numbers) + 1; i < Math.max.apply(null, numbers); i++) {
+            numbers.push(i)
+        }
+
+        numbers.shift()
+        numbers.shift()
+
+        node = document.createTextNode("Numeros: " + numbers);
+        insertHtml('q5-div', node)
+    }
+
+    q6 = function () {
+        inputs = document.querySelectorAll('.q6')
+        soma = 0
+        desvio = 0
+        for (let i = 1; i < (inputs.length + 1); i++) {
+            soma += parseInt(getInput('q6-' + i).split('-1')[0])
+        }
+
+        media = (soma / inputs.length)
+        for (let i = 1; i < (inputs.length + 1); i++) {
+            desvio += (media - parseInt(getInput('q6-' + i).split('-1')[0])) * (media - parseInt(getInput('q6-' + i).split('-1')[0]));
+        }
+
+        desvio = Math.sqrt(desvio / inputs.length)
+
+        node = document.createTextNode("Soma: " + soma + " Média: " + media + " Desvio Padrão: " + desvio);
+        insertHtml('q6-div', node)
+    }
+
+    q7 = function () {
+        inputs = document.querySelectorAll('.q7')
+        numbers = []
+        for (let i = 1; i < (inputs.length + 1); i++) {
+            numbers.push(parseInt(getInput('q7-' + i)))
+        }
+
+        node = document.createTextNode("Crescente: " + numbers.sort(function (a, b) { return a - b }) + " Decrescente: " + numbers.sort(function (a, b) { return b - a }));
+        insertHtml('q7-div', node)
+    }
+
+    q8 = function () {
+        node = document.createTextNode((getInput('q8')).normalize('NFD').replace(/[\u0300-\u036f]/g, ""));
+        insertHtml('q8-div', node)
+    }
+
+    q9 = function () {
+
+    }
+
+    q10 = function () {
+        input = parseInt(getInput('q10'))
+        date = new Date(input);
+        
+        node = document.createTextNode("Crescente: " + date);
+        insertHtml('q10-div', node)
+    }
+
+    insertHtml = function (div, html) {
+        resultHtml = document.createElement("a");
+        resultHtml.appendChild(html);
+        div = document.getElementById(div);
+        div.lastChild.remove()
+        div.appendChild(resultHtml);
+    }
+
+    getInput = function (id) {
+        input = document.getElementById(id).value
+        return input
+    }
+
+</script>
+
+</html>
