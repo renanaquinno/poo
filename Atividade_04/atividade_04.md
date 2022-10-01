@@ -1,4 +1,4 @@
-# <center>Exercício 05 - Construtores, inicialização de atributos e objetos x referências </center> 
+# <center>Exercício 04 - Construtores, inicialização de atributos e objetos x referências </center> 
 
 **1. Suponha uma classe Hotel que sirva apenas para guardar a quantidade de solicitações de reservas feitas conforme abaixo:** 
 ``` ts
