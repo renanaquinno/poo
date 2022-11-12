@@ -6,26 +6,29 @@ class Conta {
     constructor(numero: string, saldo: number) {
         this._numero = numero;
         if (saldo < 0){
-            throw new Error("Valor precisa ser maior que 0");
+            this.validarValor(saldo);
         } else {
             this._saldo = saldo;
         }
     }
 
+    private validarValor(valor: number): void{
+        if (valor <= 0){
+            throw new ValorInvalidoError("Valor precisa ser maior que R$ 0,00.")
+        }
+    }
+
     public sacar(valor: number): void {
+        this.validarValor(valor);
         if (this._saldo <= valor) {
-            throw new Error("Saldo Insuficiente");
-        } else if (valor < 0){
-            throw new Error("Valor precisa ser maior que 0");
+            throw new SaldoInsuficienteError("Saldo Insuficiente");
         }
 
         this._saldo = this._saldo - valor;
     }
     
     public depositar(valor: number): void {
-        if (valor < 0 ){
-            throw new Error("Valor precisa ser maior que 0")
-        }
+        this.validarValor(valor);
         this._saldo = this._saldo + valor;
     }
 
@@ -81,7 +84,15 @@ class Banco {
     private _contas: Conta[] = [];
 
     inserir(conta: Conta) {
-        this._contas.push(conta);
+        try {
+            this.consultar(conta.numero);
+        } catch (e: any) {
+            if (e instanceof ContaInexistenteError) {
+                this._contas.push(conta)
+            } else {
+                console.log("Conta já existe.")
+            }
+        }
     }
 
     consultar(numero: string): Conta {
@@ -90,6 +101,10 @@ class Banco {
             if (this._contas[i].numero == numero) {
                 contaProcurada = this._contas[i];
             }
+        }
+
+        if (!contaProcurada) {
+            throw new ContaInexistenteError("Conta inexistente, verifique o numero informado.")
         }
 
         return contaProcurada;
@@ -107,43 +122,39 @@ class Banco {
             }
         }
 
+        if (indiceProcurado == -1) {
+            throw new ContaInexistenteError("Conta inexistente, verifique o número informado.")
+        }
+
         return indiceProcurado;
     }
 
 
     alterar(conta: Conta) {
         let indice: number = this.consultarPorIndice(conta.numero);
-
-        if (indice != -1) {
-            this._contas[indice] = conta;
-        }
+        this._contas[indice] = conta;
+        
     }
 
     depositar(numero: string, valor: number): void {
         let indice = this.consultarPorIndice(numero);
-
-        if (indice != -1) {
-            this._contas[indice].depositar(valor);
-        }
+        this._contas[indice].depositar(valor);
+        
     }
 
     sacar(numero: string, valor: number): void {
         let indice = this.consultarPorIndice(numero);
-
-        if (indice != -1) {
-            this._contas[indice].sacar(valor);
-        }
+        this._contas[indice].sacar(valor);
+        
     }
 
     excluir(numero: string): void {
         let indice: number = this.consultarPorIndice(numero);
-
-        if (indice != -1) {
-            for (var i = indice; i < this._contas.length; i++) {
-                this._contas[i] = this._contas[i + 1];
-            }
-            this._contas.pop();
+        for (var i = indice; i < this._contas.length; i++) {
+            this._contas[i] = this._contas[i + 1];
         }
+        this._contas.pop();
+        
     }
 
     transferir(numeroDebito: string, numeroCredito: string, valor: number) {
@@ -172,8 +183,10 @@ class Banco {
     renderJuros(numero: string) {
         let contaProcurada = this.consultar(numero);
 
-        if (contaProcurada != null && contaProcurada instanceof Poupanca) {
+        if (contaProcurada instanceof Poupanca) {
             contaProcurada.renderJuros();
+        } else {
+            throw new PoupancaInvalidaError("Conta não é poupança.")
         }
     }
 
