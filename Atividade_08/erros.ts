@@ -27,3 +27,5 @@ class PoupancaInvalidaError extends Error {
         super(msg)
     }
 }
+
+export { PoupancaInvalidaError, ValorInvalidoError, SaldoInsuficienteError, ContaInexistenteError }

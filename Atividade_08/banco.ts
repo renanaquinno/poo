@@ -218,3 +218,4 @@ b.inserir(c2);
 b.transferir("1","2",200);
 
 export { Conta, Banco, Poupanca, ContaImposto }
+import { PoupancaInvalidaError, ValorInvalidoError, SaldoInsuficienteError, ContaInexistenteError }
