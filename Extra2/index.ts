@@ -1,0 +1,1 @@
+import { Conta } from "./banco";
