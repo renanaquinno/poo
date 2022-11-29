@@ -27,9 +27,6 @@ class Corretora {
 
         return acaoProcurada;
     }
-
-  
-
 }
 
 // interface Transacao {

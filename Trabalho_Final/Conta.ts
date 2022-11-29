@@ -3,10 +3,19 @@ class Conta {
     private _saldo: number;
     private _ativos: [] = [];
 
-    constructor(_id: number, _saldo: number, _ativos : []) {
-        this._id = _id;
-        this._saldo = _saldo;
-        this._ativos = _ativos;
+    constructor(id: number, saldo: number, ativos : []) {
+        this._id = id;
+        this._ativos = ativos;
+        if (saldo < 0){
+            this.validarValor(saldo);
+        } 
+        this._saldo = saldo;
+    }
+
+    private validarValor(valor: number): void{
+        if (valor <= 0){
+            throw new ValorInvalidoError("Valor precisa ser maior que R$ 0,00.")
+        }
     }
 
     public get saldo(): number {
@@ -18,16 +27,27 @@ class Conta {
     }
 
     public comprar(cod_acao: string, valor_ordem: number): void {
-            //this.validarValor(cod_acao);
-            if (this._saldo <= valor_ordem) {
-                throw new SaldoInsuficienteError("Saldo Insuficiente");
-            }
-            
-            //let qtd = (valor_ordem/cotacao);
-            //let acao: [string, number] = [cod_acao,qtd];
+        if (this._saldo <= valor_ordem) {
+            throw new Error("Saldo Insuficiente");
+        } else if (valor_ordem < 0){
+            throw new Error("Valor precisa ser maior que 0");
+        }
+        
+        //let qtd = (valor_ordem/cotacao);
+        //let acao: [string, number] = [cod_acao,qtd];
+        //this._ativos.push(acao);
+        this._saldo -= valor_ordem;
+    }
 
-            //this._ativos.push(acao);
-            this._saldo -= valor_ordem;
+    public vender(cod_acao: string, valor_ordem: number): void {
+        if (valor_ordem < 0){
+            throw new Error("Valor precisa ser maior que 0");
+        }
+        
+        //let qtd = (valor_ordem/cotacao);
+        //let acao: [string, number] = [cod_acao,qtd];
+        //this._ativos.push(acao);
+        this._saldo += valor_ordem;
     }
 
 }
