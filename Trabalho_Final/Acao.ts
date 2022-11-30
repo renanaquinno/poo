@@ -1,13 +1,9 @@
-class Acao {
-    id: string;
-    nome: string;
-    ticket: string;
-    cotacao: number;
+class Acao extends Investimento {
+    private _ticket: string;
     
-    constructor (id: string, nome: string, ticket: string, cotacao: number){
-        this.id = id;
-        this.nome = nome;
-        this.ticket = ticket;
-        this.cotacao = cotacao;
+    constructor(id:string, nome: string, valor: number, ticket: string) {
+        super(id, nome, valor);
+        this._ticket = ticket;
     }
+
 }
