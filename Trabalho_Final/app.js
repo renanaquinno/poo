@@ -16,22 +16,14 @@ do {
     opcao = input("Opção:");
     switch (opcao) {
         case "1":
-            //cadastrar();
             break;
         case "2":
-            //consultar();
             break;
         case "3":
-            //sacar();
             break;
         case "4":
-            //depositar();
             break;
         case "5":
-            //excluir();
-            break;
-        case "6":
-            //transferir();
             break;
     }
     input('Operação finalizada. Pressione <enter>');
