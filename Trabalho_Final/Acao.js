@@ -1,9 +1,7 @@
 "use strict";
-class Acao {
-    constructor(id, nome, ticket, cotacao) {
-        this.id = id;
-        this.nome = nome;
+class Acao extends Investimento {
+    constructor(id, nome, valor, ticket) {
+        super(id, nome, valor);
         this.ticket = ticket;
-        this.cotacao = cotacao;
     }
 }

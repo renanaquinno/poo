@@ -1,19 +1,53 @@
 class Corretora {
     private _homeBroker: Acao[] = [];
+    private _contas: Conta[] = [];
 
-    adicionarAtivo(ativo: Acao) {
+    adicionarAcao(acao: Acao) {
         try {
-            this.consultar(ativo.id);
+            this.consultarAcao(acao.id);
         } catch (e: any) {
             if (e instanceof AcaoInexistenteError) {
-                this._homeBroker.push(ativo)
+                this._homeBroker.push(acao)
             } else {
-                console.log("Conta já existe.")
+                console.log("Ação já existe.")
             }
         }
     }
 
-    consultar(id: string): Acao {
+    comprarAcao(id_conta : string, acao: [string, string, number]){
+        let indice = this.consultarConta(id_conta);
+        let valor_acao = this.consultarValorAcao(acao[0]);
+        
+        let qtd_acoes = (parseFloat(acao[1]) / valor_acao.valor);        
+        acao[2] = (qtd_acoes);
+        if (indice != -1) {
+            this._contas[indice].comprarAcao(acao);
+        }
+    }
+
+    venderAcao(id_conta : string, acao: [string, string]){
+        let indice: number = this.consultarConta(id_conta);
+        if (indice != -1) {
+            for (var i = indice; i < this._contas.length; i++) {
+                this._contas[i] = this._contas[i + 1];
+            }
+            this._contas.pop();
+            this._contas[indice].venderAcao(acao);
+
+        }
+    }
+    
+    private consultarConta(id_conta: string): number {
+        let indiceProcurado: number = -1;
+        for (let i = 0; i < this._contas.length; i++) {
+            if (this._contas[i].id == id_conta) {
+                indiceProcurado = i;
+            }
+        }
+        return indiceProcurado;
+    }
+
+    consultarAcao(id: string): Acao {
         let acaoProcurada!: Acao;
         for (let i = 0; i < this._homeBroker.length; i++) {
             if (this._homeBroker[i].id == id) {
@@ -27,7 +61,26 @@ class Corretora {
 
         return acaoProcurada;
     }
+
+
+    consultarValorAcao(id: string): Acao {
+        let acaoProcurada!: Acao;
+        for (let i = 0; i < this._homeBroker.length; i++) {
+            if (this._homeBroker[i].id == id) {
+                acaoProcurada = this._homeBroker[i];
+            }
+        }
+
+        if (!acaoProcurada) {
+            throw new AcaoInexistenteError("Ação inexistente, verifique o numero informado.")
+        }
+
+        return acaoProcurada;
+    }
+    
 }
+
+export {Corretora};
 
 // interface Transacao {
 //     operacao(id_acionista: number,cod_acao: string, qtd: number, operacao: number): void;
