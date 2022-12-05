@@ -20,7 +20,7 @@ class Corretora {
         }
     }
     comprarAcao(id_conta, acao) {
-        let indice = this.consultarConta(id_conta);
+        let indice = this.consultarIndiceConta(id_conta);
         let valor_acao = this.consultarValorAcao(acao[0]);
         let qtd_acoes = (parseFloat(acao[1]) / valor_acao.valor);
         acao[2] = (qtd_acoes);
@@ -29,7 +29,7 @@ class Corretora {
         }
     }
     venderAcao(id_conta, acao) {
-        let indice = this.consultarConta(id_conta);
+        let indice = this.consultarIndiceConta(id_conta);
         if (indice != -1) {
             for (var i = indice; i < this._contas.length; i++) {
                 this._contas[i] = this._contas[i + 1];
@@ -38,7 +38,7 @@ class Corretora {
             this._contas[indice].venderAcao(acao);
         }
     }
-    consultarConta(id_conta) {
+    consultarIndiceConta(id_conta) {
         let indiceProcurado = -1;
         for (let i = 0; i < this._contas.length; i++) {
             if (this._contas[i].id == id_conta) {
@@ -46,6 +46,15 @@ class Corretora {
             }
         }
         return indiceProcurado;
+    }
+    consultarConta(id_conta) {
+        let contaProcurada;
+        for (let i = 0; i < this._contas.length; i++) {
+            if (this._contas[i].id == id_conta) {
+                contaProcurada = this._contas[i];
+            }
+        }
+        return contaProcurada;
     }
     consultarAcao(id) {
         let acaoProcurada;

@@ -5,6 +5,4 @@ class Acao extends Investimento {
         super(id, nome, valor);
         this.ticket = ticket;
     }
-
-
 }

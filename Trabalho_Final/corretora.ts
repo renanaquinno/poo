@@ -15,7 +15,7 @@ class Corretora {
     }
 
     comprarAcao(id_conta : string, acao: [string, string, number]){
-        let indice = this.consultarConta(id_conta);
+        let indice = this.consultarIndiceConta(id_conta);
         let valor_acao = this.consultarValorAcao(acao[0]);
         
         let qtd_acoes = (parseFloat(acao[1]) / valor_acao.valor);        
@@ -25,19 +25,18 @@ class Corretora {
         }
     }
 
-    venderAcao(id_conta : string, acao: [string, string]){
-        let indice: number = this.consultarConta(id_conta);
+    venderAcao(id_conta : string, acao: [string, string,number]){
+        let indice: number = this.consultarIndiceConta(id_conta);
         if (indice != -1) {
             for (var i = indice; i < this._contas.length; i++) {
                 this._contas[i] = this._contas[i + 1];
             }
             this._contas.pop();
             this._contas[indice].venderAcao(acao);
-
         }
     }
     
-    private consultarConta(id_conta: string): number {
+    consultarIndiceConta(id_conta: string): number {
         let indiceProcurado: number = -1;
         for (let i = 0; i < this._contas.length; i++) {
             if (this._contas[i].id == id_conta) {
@@ -47,6 +46,18 @@ class Corretora {
         return indiceProcurado;
     }
 
+       
+    consultarConta(id_conta: string): Conta {
+        let contaProcurada!: Conta;
+
+        for (let i = 0; i < this._contas.length; i++) {
+            if (this._contas[i].id == id_conta) {
+                contaProcurada = this._contas[i];
+            }
+        }
+        return contaProcurada;
+    }
+
     consultarAcao(id: string): Acao {
         let acaoProcurada!: Acao;
         for (let i = 0; i < this._homeBroker.length; i++) {
@@ -54,11 +65,9 @@ class Corretora {
                 acaoProcurada = this._homeBroker[i];
             }
         }
-
         if (!acaoProcurada) {
             throw new AcaoInexistenteError("Ação inexistente, verifique o numero informado.")
         }
-
         return acaoProcurada;
     }
 
@@ -70,14 +79,11 @@ class Corretora {
                 acaoProcurada = this._homeBroker[i];
             }
         }
-
         if (!acaoProcurada) {
             throw new AcaoInexistenteError("Ação inexistente, verifique o numero informado.")
         }
-
         return acaoProcurada;
     }
-    
 }
 
 export {Corretora};
