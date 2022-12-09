@@ -16,8 +16,16 @@ class AcaoInexistenteError extends AplicacaoError {
     }
 }
 
+class AcaoJaExistenteError extends AplicacaoError {
+    constructor(msg: string) {
+        super(msg)
+    }
+}
+
 class SaldoInsuficienteError extends AplicacaoError {
     constructor(msg: string) {
         super(msg)
     }
 }
+
+export {AplicacaoError, ValorInvalidoError, AcaoInexistenteError, AcaoJaExistenteError, SaldoInsuficienteError};

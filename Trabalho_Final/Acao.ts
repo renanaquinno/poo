@@ -1,3 +1,4 @@
+import { Investimento } from "./Investimento";
 class Acao extends Investimento {
     ticket: string;
     
@@ -6,3 +7,6 @@ class Acao extends Investimento {
         this.ticket = ticket;
     }
 }
+
+
+export {Acao};

@@ -1,3 +1,4 @@
+import { Investimento } from "./Investimento";
 class TesouroDireto extends Investimento {
     private _vencimento: string;
     private _taxaRetorno: string;
