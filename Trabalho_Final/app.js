@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const prompt_sync_1 = __importDefault(require("prompt-sync"));
 const Corretora_1 = require("./Corretora");
 const Acao_1 = require("./Acao");
+const TesouroDireto_1 = require("./TesouroDireto");
 const input = (0, prompt_sync_1.default)();
 let c = new Corretora_1.Corretora();
 //let contas: Conta[] = []
@@ -19,20 +20,20 @@ do {
         case "1":
             do {
                 console.log('\nBem vindo ao Sistema de Gerenciamento de Ações - Corretora\nDigite uma opção:');
-                console.log('1 - Cadastrar Ação    2 - Editar Ação    3 - Excluir Ação  4 - Consultar Ação  0 - Sair\n');
+                console.log('1 - Cadastrar Ativo    2 - Editar Ativo    3 - Excluir Ativo  4 - Consultar Ativos  0 - Sair\n');
                 opcao = input("Opção:");
                 switch (opcao) {
                     case "1":
-                        cadastrarAcao();
+                        cadastrarAtivo();
                         break;
                     case "2":
-                        editarAcao();
+                        editarAtivo();
                         break;
                     case "3":
-                        excluirAcao();
+                        excluirAtivo();
                         break;
                     case "4":
-                        consultarAcoes();
+                        consultarAtivos();
                         break;
                 }
             } while (opcao != "0");
@@ -50,7 +51,7 @@ do {
                         venderAcao();
                         break;
                     case "3":
-                        consultarAcoes();
+                        consultarAtivos();
                         break;
                 }
             } while (opcao != "0");
@@ -62,6 +63,16 @@ input('Operação finalizada. Pressione <enter>');
 function atualizarBancoDeDados() {
     c.atualizarBancoDeDados();
 }
+function cadastrarAtivo() {
+    console.log("\nCadastrar Ativo\n");
+    var tipo = input('Deseja Cadastrar Ação (A) ou Tesouro Direto (T): Digite A ou T ').toLocaleLowerCase();
+    if (tipo == 'a') {
+        cadastrarAcao();
+    }
+    else if (tipo == 't') {
+        cadastrarTesouro();
+    }
+}
 function cadastrarAcao() {
     console.log("\nCadastrar Ação\n");
     var acao;
@@ -71,14 +82,49 @@ function cadastrarAcao() {
     acao = new Acao_1.Acao('0', nome, parseFloat(valor), ticket);
     c.cadastrarAcao(acao);
 }
-function consultarAcoes() {
-    console.log("\nConsultar Ações\n");
-    console.log(c.listarAcoes());
+function cadastrarTesouro() {
+    console.log("\nCadastrar Tesouro Direto\n");
+    var tesouro;
+    var nome = input('Digite o Nome do Tesuro: ');
+    var vencimento = input('Digite a Data de vencimento DD/MM/AAAA: ');
+    var valor_unitario = input('Digite o Valor Unitario: ');
+    var taxa_retorno = input('Digite a Taxa de Retorno: ');
+    tesouro = new TesouroDireto_1.TesouroDireto('0', nome, parseFloat(valor_unitario), vencimento, taxa_retorno);
+    c.cadastrarTesouro(tesouro);
+}
+function consultarAtivos() {
+    console.log("\nConsultar Ativos\n");
+    console.log(c.listarAtivos());
+}
+function excluirAtivo() {
+    console.log("\nExcluir Ativo\n");
+    var tipo = input('Deseja Excluir Ação (A) ou Tesouro Direto (T): Digite A ou T ').toLocaleLowerCase();
+    if (tipo == 'a') {
+        excluirAcao();
+    }
+    else if (tipo == 't') {
+        excluirTesouro();
+    }
 }
 function excluirAcao() {
     console.log("\nExcluir Ação\n");
     let ticket = input('Digite o ticket da ação:');
     c.excluirAcao(ticket);
+}
+function excluirTesouro() {
+    console.log("\nExcluir Tesouro\n");
+    let nome_tesouro = input('Digite o Nome do Tesouro:');
+    c.excluirTesouro(nome_tesouro);
+}
+function editarAtivo() {
+    console.log("\nEditar Ativo\n");
+    var tipo = input('Deseja Editar Ação (A) ou Tesouro Direto (T): Digite A ou T ').toLocaleLowerCase();
+    if (tipo == 'a') {
+        editarAcao();
+    }
+    else if (tipo == 't') {
+        editar_Tesouro();
+    }
 }
 function editarAcao() {
     console.log("\nEditar Ação\n");
@@ -97,6 +143,30 @@ function editarAcao() {
         case "3":
             let valor = input('\nNovo Valor: ');
             c.editarPrecoAcao(ticket_editar, parseFloat(valor));
+            break;
+    }
+}
+function editar_Tesouro() {
+    console.log("\nEditar Tesouro\n");
+    let tesouro_editar = input('Nome do Tesouro: ');
+    c.consultarTesouroNome(tesouro_editar);
+    let edicao = input('\n Escolha uma opção \n1 - Editar Nome | 2 - Editar Valor | 3 - Editar Vencimento | 4 - Editar Rentabilidade \n');
+    switch (edicao) {
+        case "1":
+            let nome = input('\nNovo Nome: ');
+            c.editarNomeTesouro(tesouro_editar, nome);
+            break;
+        case "2":
+            let valor = input('\nNovo Valor: ');
+            c.editarValorTesouro(tesouro_editar, parseFloat(valor));
+            break;
+        case "3":
+            let vencimento = input('\nNovo Vencimento: ');
+            c.editarVencimentoTesouro(tesouro_editar, vencimento);
+            break;
+        case "4":
+            let rentabilidade_anual = input('\nNova Rentabilidade Anual: ');
+            c.editarRentabilidadeTesouro(tesouro_editar, rentabilidade_anual);
             break;
     }
 }
@@ -158,16 +228,28 @@ function carregarDeArquivo() {
         let linha = lrs.readline();
         if (linha != null) {
             let array = linha.split(";");
-            let nome = array[0];
-            let ticket = array[1];
-            let valor = parseFloat(array[2]);
+            let tipo = array[0];
+            let nome = array[1];
             let acao;
-            acao = new Acao_1.Acao("0", nome, valor, ticket);
-            c.cadastrarAcao(acao);
-            console.log('Ação lida: ' + acao.ticket);
+            let tesouro;
+            if (tipo == 'a') {
+                let ticket = array[2];
+                let valor = parseFloat(array[3]);
+                acao = new Acao_1.Acao("0", nome, valor, ticket);
+                c.cadastrarAcao(acao);
+                console.log('Ação lida: ' + acao.nome_ativo);
+            }
+            else if (tipo == 't') {
+                let valor = parseFloat(array[2]);
+                let vencimento = array[3];
+                let rentabilidade_anual = array[4];
+                tesouro = new TesouroDireto_1.TesouroDireto("0", nome, valor, vencimento, rentabilidade_anual);
+                c.cadastrarTesouro(tesouro);
+                console.log('Tesouro lido: ' + tesouro.nome_ativo);
+            }
         }
         else {
-            console.log("fim do arquivo");
+            console.log("Banco de Dados Inicializado com Sucesso!!");
             break;
         }
     }
