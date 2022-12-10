@@ -1,31 +1,135 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Conta = void 0;
 class Conta {
-    constructor(id, saldo, ativos) {
-        this._ativos = ['', '', 0];
-        this.id = id;
-        this._ativos = ativos;
+    constructor(nome, saldo) {
+        this._acaoComprada = [];
+        this._tesouroComprado = [];
+        this.nome = nome;
         this._saldo = saldo;
     }
     get saldo() {
         return this._saldo;
     }
-    get ativos() {
-        return this._ativos;
+    verCarteira(nome) {
+        let ativo_procurado = [];
+        for (let i = 0; i < this._acaoComprada.length; i++) {
+            if (this._acaoComprada[i].nome_conta == nome) {
+                ativo_procurado.push(this._acaoComprada[i]);
+            }
+        }
+        for (let i = 0; i < this._tesouroComprado.length; i++) {
+            if (this._tesouroComprado[i].nome_conta == nome) {
+                ativo_procurado.push(this._tesouroComprado[i]);
+            }
+        }
+        console.log(ativo_procurado);
+        return ativo_procurado;
     }
-    comprarAcao(acao) {
-        if (this._saldo <= parseFloat(acao[1])) {
+    //////////////////// FUNÇÕES DE AÇÃO ////////////////////
+    comprarAcao(ativo, valor_total) {
+        let x = -1;
+        valor_total = ativo.quantidade * valor_total;
+        if (this._saldo <= valor_total) {
             throw new Error("Saldo Insuficiente");
         }
-        else if (parseFloat(acao[1]) < 0) {
+        else if (ativo.quantidade < 0) {
             throw new Error("Valor precisa ser maior que 0");
         }
-        this._ativos.push(acao[0], acao[1], acao[2]); //CORRIGIR
-        this._saldo -= parseFloat(acao[1]);
+        for (let i = 0; i < this._acaoComprada.length; i++) {
+            if (ativo.nome_conta == this._acaoComprada[i].nome_conta && ativo.nome_ativo == this._acaoComprada[i].nome_ativo) {
+                this._acaoComprada[i].quantidade += ativo.quantidade;
+                this._saldo -= valor_total;
+                return;
+            }
+        }
+        this._acaoComprada.push(ativo);
+        this._saldo -= valor_total;
     }
-    venderAcao(acao) {
-        if (parseFloat(acao[1]) < 0) {
+    venderAcao(tesouro, valor_total) {
+        let indice = this.consultarPorIndiceAcao(tesouro.nome_ativo);
+        if (valor_total < 0) {
             throw new Error("Valor precisa ser maior que 0");
         }
-        this._saldo += parseFloat(acao[1]);
+        if (indice != -1) {
+            for (var i = indice; i < this._acaoComprada.length; i++) {
+                this._acaoComprada[i] = this._acaoComprada[i + 1];
+            }
+            this._acaoComprada.pop();
+            this._saldo += valor_total;
+        }
+    }
+    consultarPorIndiceAcao(nome) {
+        let indiceProcurado = -1;
+        for (let i = 0; i < this._acaoComprada.length; i++) {
+            if (this._acaoComprada[i].nome_ativo == nome) {
+                indiceProcurado = i;
+            }
+        }
+        return indiceProcurado;
+    }
+    carregarAcao(ativo) {
+        this._acaoComprada.push(ativo);
+    }
+    //////////////////// FUNÇÕES DE TESOURO ////////////////////
+    comprarTesouro(tesouro, valor_total) {
+        let x = -1;
+        valor_total = tesouro.quantidade * valor_total;
+        if (this._saldo <= valor_total) {
+            throw new Error("Saldo Insuficiente");
+        }
+        else if (tesouro.quantidade < 0) {
+            throw new Error("Valor precisa ser maior que 0");
+        }
+        for (let i = 0; i < this._tesouroComprado.length; i++) {
+            if (tesouro.nome_conta == this._tesouroComprado[i].nome_conta && tesouro.nome_ativo == this._tesouroComprado[i].nome_ativo) {
+                this._tesouroComprado[i].quantidade += tesouro.quantidade;
+                this._saldo -= valor_total;
+                return;
+            }
+        }
+        this._tesouroComprado.push(tesouro);
+        this._saldo -= valor_total;
+    }
+    venderTesouro(tesouro, valor_total) {
+        let indice = this.consultarPorIndiceTesouro(tesouro.nome_ativo);
+        if (valor_total < 0) {
+            throw new Error("Valor precisa ser maior que 0");
+        }
+        if (indice != -1) {
+            for (var i = indice; i < this._acaoComprada.length; i++) {
+                this._acaoComprada[i] = this._acaoComprada[i + 1];
+            }
+            this._acaoComprada.pop();
+            this._saldo += valor_total;
+        }
+    }
+    consultarPorIndiceTesouro(nome) {
+        let indiceProcurado = -1;
+        for (let i = 0; i < this._acaoComprada.length; i++) {
+            if (this._acaoComprada[i].nome_ativo == nome) {
+                indiceProcurado = i;
+            }
+        }
+        return indiceProcurado;
+    }
+    carregarTesouro(ativo) {
+        this._tesouroComprado.push(ativo);
+    }
+    //////////////////// FUNÇÕES EXTRA ////////////////////
+    atualizarBanco() {
+        let listaStringsCarteiras = '';
+        for (let i = 0; i < this._acaoComprada.length; i++) {
+            listaStringsCarteiras = listaStringsCarteiras + this._acaoComprada[i].nome_conta + ';' + this._acaoComprada[i].nome_ativo + ';' + this._acaoComprada[i].quantidade + '\n';
+        }
+        for (let i = 0; i < this._tesouroComprado.length; i++) {
+            listaStringsCarteiras = listaStringsCarteiras + this._tesouroComprado[i].nome_conta + ';' + this._tesouroComprado[i].nome_ativo + ';' + this._tesouroComprado[i].quantidade + '\n';
+        }
+        var carteiras = require('fs');
+        carteiras.writeFile('carteiras.txt', listaStringsCarteiras, function (err) {
+            if (err)
+                throw err;
+        });
     }
 }
+exports.Conta = Conta;

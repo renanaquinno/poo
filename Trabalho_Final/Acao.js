@@ -7,5 +7,8 @@ class Acao extends Investimento_1.Investimento {
         super(id, nome, valor);
         this.ticket = ticket;
     }
+    get valor() {
+        return this.valor;
+    }
 }
 exports.Acao = Acao;

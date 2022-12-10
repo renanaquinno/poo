@@ -1,11 +1,14 @@
 import { Acao } from "./Acao";
-import {AcaoInexistenteError} from "./Erros"; 
+import { AcaoInexistenteError } from "./Erros";
 import { TesouroDireto } from "./TesouroDireto";
+import { Conta } from "./Conta";
+import { AtivoComprado } from "./AtivoComprado";
 class Corretora {
     private _homeBroker: Acao[] = [];
     private _homeBrokerTesouro: TesouroDireto[] = [];
     private _contas: Conta[] = [];
 
+    //////////////////// FUNÇÕES DE ATIVOS CORRETORA ////////////////////
     cadastrarAcao(acao: Acao) {
         try {
             this.consultarAcaoTicket(acao.ticket);
@@ -20,7 +23,7 @@ class Corretora {
 
     cadastrarTesouro(tesouro: TesouroDireto) {
         try {
-            this.consultarAcaoTicket(tesouro.nome);
+            this.consultarAcaoTicket(tesouro.nome_ativo);
         } catch (e: any) {
             if (e instanceof AcaoInexistenteError) {
                 this._homeBrokerTesouro.push(tesouro)
@@ -30,6 +33,19 @@ class Corretora {
         }
     }
 
+    cadastrarConta(conta: Conta) {
+        try {
+            this.consultarAcaoTicket(conta.nome);
+        } catch (e: any) {
+            if (e instanceof AcaoInexistenteError) {
+                this._contas.push(conta)
+            } else {
+                console.log("Conta já existe.")
+            }
+        }
+    }
+
+    //////////////////// FUNÇÕES DE AÇÃO CORRETORA ////////////////////
     editarNomeAcao(ticket: string, novoNome: string): void {
         this.consultarAcaoTicket(ticket).nome_ativo = novoNome;
     }
@@ -40,23 +56,6 @@ class Corretora {
 
     editarTicketAcao(ticket: string, novoTicket: string): void {
         this.consultarAcaoTicket(ticket).ticket = novoTicket;
-    }
-
-
-    editarNomeTesouro(nome: string, novo_nome: string): void {
-        this.consultarTesouroNome(nome).nome_ativo = novo_nome;
-    }
-
-    editarValorTesouro(nome: string, novo_valor: number): void {
-        this.consultarTesouroNome(nome).valor_ativo = novo_valor;
-    }
-
-    editarVencimentoTesouro(nome: string, novo_vencimento: string): void {
-        this.consultarTesouroNome(nome).data_vencimento = novo_vencimento;
-    }
-
-    editarRentabilidadeTesouro(nome: string, nova_renatabilidade_anual: string): void {
-        this.consultarTesouroNome(nome).rentabilidade_anual = nova_renatabilidade_anual;
     }
 
     consultarAcao(id: string): Acao {
@@ -85,19 +84,6 @@ class Corretora {
         return acaoProcurada;
     }
 
-    consultarTesouroNome(nome: string): TesouroDireto {
-        let tesouroProcurado!: TesouroDireto;
-        for (let i = 0; i < this._homeBrokerTesouro.length; i++) {
-            if (this._homeBrokerTesouro[i].nome_ativo == nome) {
-                tesouroProcurado = this._homeBrokerTesouro[i];
-            }
-        }
-        if (!tesouroProcurado) {
-            throw new AcaoInexistenteError("Tesouro inexistente, verifique o nome informado.")
-        }
-        return tesouroProcurado;
-    }
-
     consultarIndiceAcao(ticket: string): number {
         let indiceProcurado: number = -1;
         for (let i = 0; i < this._homeBroker.length; i++) {
@@ -109,6 +95,46 @@ class Corretora {
             throw new AcaoInexistenteError("Ação Inexistente, Verifique o Ticket Informado.")
         }
         return indiceProcurado;
+    }
+
+    excluirAcao(ticket: string): void {
+        let indice: number = this.consultarIndiceAcao(ticket);
+        if (indice != -1) {
+            for (var i = indice; i < this._homeBroker.length; i++) {
+                this._homeBroker[i] = this._homeBroker[i + 1];
+            }
+            this._homeBroker.pop();
+        }
+    }
+
+    //////////////////// FUNÇÕES DE TESOURO CORRETORA ////////////////////
+    editarNomeTesouro(nome: string, novo_nome: string): void {
+        this.consultarTesouroNome(nome).nome_ativo = novo_nome;
+    }
+
+    editarValorTesouro(nome: string, novo_valor: number): void {
+        this.consultarTesouroNome(nome).valor_ativo = novo_valor;
+    }
+
+    editarVencimentoTesouro(nome: string, novo_vencimento: string): void {
+        this.consultarTesouroNome(nome).data_vencimento = novo_vencimento;
+    }
+
+    editarRentabilidadeTesouro(nome: string, nova_renatabilidade_anual: string): void {
+        this.consultarTesouroNome(nome).rentabilidade_anual = nova_renatabilidade_anual;
+    }
+
+    consultarTesouroNome(nome: string): TesouroDireto {
+        let tesouroProcurado!: TesouroDireto;
+        for (let i = 0; i < this._homeBrokerTesouro.length; i++) {
+            if (this._homeBrokerTesouro[i].nome_ativo == nome) {
+                tesouroProcurado = this._homeBrokerTesouro[i];
+            }
+        }
+        if (!tesouroProcurado) {
+            throw new AcaoInexistenteError("Tesouro inexistente, verifique o nome informado.")
+        }
+        return tesouroProcurado;
     }
 
     consultarIndiceTesouro(nome_ativo: string): number {
@@ -124,15 +150,6 @@ class Corretora {
         return indiceProcurado;
     }
 
-    excluirAcao(ticket: string): void {
-        let indice: number = this.consultarIndiceAcao(ticket);
-        if (indice != -1) {
-            for (var i = indice; i < this._homeBroker.length; i++) {
-                this._homeBroker[i] = this._homeBroker[i + 1];
-            }
-            this._homeBroker.pop();
-        }
-    }
     excluirTesouro(nome: string): void {
         let indice: number = this.consultarIndiceTesouro(nome);
         if (indice != -1) {
@@ -144,57 +161,79 @@ class Corretora {
     }
 
 
-    consultarValorAcao(id: string): Acao {
-        let acaoProcurada!: Acao;
-        for (let i = 0; i < this._homeBroker.length; i++) {
-            if (this._homeBroker[i].id == id) {
-                acaoProcurada = this._homeBroker[i];
-            }
-        }
-        if (!acaoProcurada) {
-            throw new AcaoInexistenteError("Ação inexistente, verifique o numero informado.")
-        }
-        return acaoProcurada;
+    //////////////////// FUNÇÕES DE ATIVO ////////////////////
+    verCarteira(conta: string) {
+        let indice = this.consultarIndiceConta(conta);
+        this._contas[indice].verCarteira(conta);
     }
 
-    comprarAcao(id_conta : string, acao: [string, string, number]){
-        let indice = this.consultarIndiceConta(id_conta);
-        let valor_acao = this.consultarValorAcao(acao[0]);
-        
-        let qtd_acoes = (parseFloat(acao[1]) / valor_acao.valor_ativo);        
-        acao[2] = (qtd_acoes);
+    carregarAtivos(conta: string, ativo: AtivoComprado) {
+        let indice: number = this.consultarIndiceConta(conta);
+        this._contas[indice].carregarAcao(ativo)
+    }
+
+    //////////////////// FUNÇÕES DE AÇÃO INVESTIDOR ////////////////////
+    comprarAcao(conta: string, acao: AtivoComprado) {
+        let indice = this.consultarIndiceConta(conta);
+        let valor_total = this.consultarAcaoTicket(acao.nome_ativo).valor_ativo;
         if (indice != -1) {
-            this._contas[indice].comprarAcao(acao);
+            this._contas[indice].comprarAcao(acao, valor_total);
         }
     }
 
-    venderAcao(id_conta : string, acao: [string, string,number]){
-        let indice: number = this.consultarIndiceConta(id_conta);
+    venderAcao(conta: string, ativo: AtivoComprado) {
+        let indice: number = this.consultarIndiceConta(conta);
+        let valor_total = this.consultarAcaoTicket(ativo.nome_ativo).valor_ativo;
+
         if (indice != -1) {
-            for (var i = indice; i < this._contas.length; i++) {
-                this._contas[i] = this._contas[i + 1];
-            }
-            this._contas.pop();
-            this._contas[indice].venderAcao(acao);
+            this._contas[indice].venderAcao(ativo, valor_total);
         }
     }
-    
-    consultarIndiceConta(id_conta: string): number {
+
+    //////////////////// FUNÇÕES DE TESOURO INVESTIDOR ////////////////////
+    comprarTesouro(conta: string, tesouro: AtivoComprado) {
+        let indice = this.consultarIndiceConta(conta);
+        let valor_total = this.consultarTesouroNome(tesouro.nome_ativo).valor_ativo;
+        if (indice != -1) {
+            this._contas[indice].comprarTesouro(tesouro, valor_total);
+        }
+    }
+
+    venderTesouro(conta: string, tesouro: AtivoComprado) {
+        let indice: number = this.consultarIndiceConta(conta);
+        let valor_total = this.consultarTesouroNome(tesouro.nome_ativo).valor_ativo;
+
+        if (indice != -1) {
+            this._contas[indice].venderTesouro(tesouro, valor_total);
+        }
+    }
+
+    carregarTesouro(conta: string, tesouro: AtivoComprado) {
+        let indice: number = this.consultarIndiceConta(conta);
+        this._contas[indice].carregarTesouro(tesouro)
+    }
+
+
+    ////////////////////////// FUNÇÕES EXTRAS //////////////////////////
+
+    consultarIndiceConta(nome: string): number {
         let indiceProcurado: number = -1;
         for (let i = 0; i < this._contas.length; i++) {
-            if (this._contas[i].id == id_conta) {
+            if (this._contas[i].nome == nome) {
                 indiceProcurado = i;
             }
+        }
+        if (indiceProcurado == -1) {
+            throw new AcaoInexistenteError("Conta Inexistente, Verifique o Nome Informado.")
         }
         return indiceProcurado;
     }
 
-       
-    consultarConta(id_conta: string): Conta {
-        let contaProcurada!: Conta;
 
+    consultarConta(nome: string): Conta {
+        let contaProcurada!: Conta;
         for (let i = 0; i < this._contas.length; i++) {
-            if (this._contas[i].id == id_conta) {
+            if (this._contas[i].nome == nome) {
                 contaProcurada = this._contas[i];
             }
         }
@@ -202,48 +241,61 @@ class Corretora {
     }
 
     listarAtivos(): string {
-        let listaStringAcoes = 'AÇÕES \n';
-        let listaStringTesouro = 'TESOURO \n';
-        for(let i: number = 0; i < this._homeBroker.length; i++) {
-            listaStringAcoes = listaStringAcoes + 
-                           ' ID: ' + this._homeBroker[i].id +  
-                           ' - Empresa: ' + this._homeBroker[i].nome_ativo +  
-                           ' - Ticket: ' + this._homeBroker[i].ticket +  
-                           ' - Valor: '  + this._homeBroker[i].valor_ativo + '\n';                 
-        }   
-        for(let i: number = 0; i < this._homeBrokerTesouro.length; i++) {
-            listaStringTesouro = listaStringTesouro + 
-                           ' ID: ' + this._homeBrokerTesouro[i].id +  
-                           ' - Tesouro: ' + this._homeBrokerTesouro[i].nome_ativo +  
-                           ' - Valor: ' + this._homeBrokerTesouro[i].valor_ativo +  
-                           ' - Vencimento: ' + this._homeBrokerTesouro[i].data_vencimento +  
-                           ' - Rentabilidade Anual: '  + this._homeBrokerTesouro[i].rentabilidade_anual + '\n';                 
-        }   
-        return listaStringAcoes + listaStringTesouro;
+        let listaStringAcoes = '\nAÇÕES:\n';
+        let listaStringTesouro = '\nTESOURO:\n';
+        let listaStringContas = '\nCONTAS:\n';
+
+        for (let i: number = 0; i < this._homeBroker.length; i++) {
+            listaStringAcoes = listaStringAcoes +
+                ' - Empresa: ' + this._homeBroker[i].nome_ativo +
+                ' - Ticket: ' + this._homeBroker[i].ticket +
+                ' - Valor: ' + this._homeBroker[i].valor_ativo + '\n';
+        }
+
+        for (let i: number = 0; i < this._homeBrokerTesouro.length; i++) {
+            listaStringTesouro = listaStringTesouro +
+                ' - Tesouro: ' + this._homeBrokerTesouro[i].nome_ativo +
+                ' - Valor: ' + this._homeBrokerTesouro[i].valor_ativo +
+                ' - Vencimento: ' + this._homeBrokerTesouro[i].data_vencimento +
+                ' - Rentabilidade Anual: ' + this._homeBrokerTesouro[i].rentabilidade_anual + '\n';
+        }
+
+        for (let i: number = 0; i < this._contas.length; i++) {
+            listaStringContas = listaStringContas +
+                ' Nome: ' + this._contas[i].nome +
+                ' - Saldo: ' + this._contas[i].saldo + '\n';
+        }
+
+        return listaStringAcoes + listaStringTesouro + listaStringContas;
     }
 
     atualizarBancoDeDados(): void {
         let listaStrings = '';
-        
-        for(let i: number = 0; i < this._homeBroker.length; i++) {
-            listaStrings = listaStrings + 'a;' + this._homeBroker[i].nome_ativo + ';' + this._homeBroker[i].ticket +  ';'  + this._homeBroker[i].valor_ativo + '\n';                 
-        }   
-        
-        for(let i: number = 0; i < this._homeBrokerTesouro.length; i++) {
-            listaStrings = listaStrings + 't;' + this._homeBrokerTesouro[i].nome_ativo + ';' + this._homeBrokerTesouro[i].valor_ativo +  ';'  + this._homeBrokerTesouro[i].data_vencimento + ';' + this._homeBrokerTesouro[i].rentabilidade_anual + '\n';                 
-        }   
+        let listaStringsContas = '';
 
-        var banco = require('fs');
-        banco.writeFile('bd.txt', listaStrings, function (err) {
+        for (let i: number = 0; i < this._homeBroker.length; i++) {
+            listaStrings = listaStrings + 'A;' + this._homeBroker[i].nome_ativo + ';' + this._homeBroker[i].ticket + ';' + this._homeBroker[i].valor_ativo + '\n';
+        }
+
+        for (let i: number = 0; i < this._homeBrokerTesouro.length; i++) {
+            listaStrings = listaStrings + 'T;' + this._homeBrokerTesouro[i].nome_ativo + ';' + this._homeBrokerTesouro[i].valor_ativo + ';' + this._homeBrokerTesouro[i].data_vencimento + ';' + this._homeBrokerTesouro[i].rentabilidade_anual + '\n';
+        }
+
+        var ativos = require('fs');
+        ativos.writeFile('ativos.txt', listaStrings, function (err: any) {
             if (err) throw err;
-            console.log('Banco de Dados Atualizado!');
-        });    
+        });
+
+        for (let i: number = 0; i < this._contas.length; i++) {
+            listaStringsContas = listaStringsContas + this._contas[i].nome + ';' + this._contas[i].saldo + '\n';
+            this._contas[i].atualizarBanco();
+        }
+
+        var contas = require('fs');
+        contas.writeFile('contas.txt', listaStringsContas, function (err: any) {
+            if (err) throw err;
+        });
     }
 }
 
-export {Corretora};
-
-// let a01: Acao = new Acao('1', 'Itaú', 19.90, 'ITUB4');
-// let corretora: Corretora = new Corretora();
-// corretora.adicionarAcao(a01);
-// console.log(corretora.consultarAcao('1'));
+export { Corretora };

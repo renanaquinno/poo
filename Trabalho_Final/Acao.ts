@@ -6,7 +6,10 @@ class Acao extends Investimento {
         super(id, nome, valor);
         this.ticket = ticket;
     }
-}
 
+    public get valor() : number{
+        return this.valor;
+    }
+}
 
 export {Acao};
