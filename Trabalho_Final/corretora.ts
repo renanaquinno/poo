@@ -1,14 +1,28 @@
 import { Acao } from "./Acao";
 import { AcaoInexistenteError } from "./Erros";
 import { TesouroDireto } from "./TesouroDireto";
-import { Conta } from "./Conta";
+import { Conta, Investidor } from "./Conta";
 import { AtivoComprado } from "./AtivoComprado";
+
 class Corretora {
     private _homeBroker: Acao[] = [];
     private _homeBrokerTesouro: TesouroDireto[] = [];
-    private _contas: Conta[] = [];
+    private _contas: Investidor[] = [];
 
     //////////////////// FUNÇÕES DE ATIVOS CORRETORA ////////////////////
+    fazerLogin(nome: string, senha: string){
+        let conta_procurada!: Investidor;
+        for (let i = 0; i < this._contas.length; i++) {
+            if (this._contas[i].nome == nome && this._contas[i].senha == senha) {
+                conta_procurada = this._contas[i];
+            }
+        }
+        if (!conta_procurada) {
+            throw new AcaoInexistenteError("Erro de Login.")
+        }
+        return conta_procurada;
+    }
+
     cadastrarAcao(acao: Acao) {
         try {
             this.consultarAcaoTicket(acao.ticket);
@@ -33,7 +47,7 @@ class Corretora {
         }
     }
 
-    cadastrarConta(conta: Conta) {
+    cadastrarConta(conta: Investidor) {
         try {
             this.consultarAcaoTicket(conta.nome);
         } catch (e: any) {
@@ -83,6 +97,7 @@ class Corretora {
         }
         return acaoProcurada;
     }
+
 
     consultarIndiceAcao(ticket: string): number {
         let indiceProcurado: number = -1;
@@ -167,19 +182,24 @@ class Corretora {
         this._contas[indice].verCarteira(conta);
     }
 
-    carregarAtivos(conta: string, ativo: AtivoComprado) {
+    carregarCarteira(conta: string, ativo: AtivoComprado) {
         let indice: number = this.consultarIndiceConta(conta);
-        this._contas[indice].carregarAcao(ativo)
+        if (ativo.tipo_ativo == 'A'){
+            this._contas[indice].carregarAcao(ativo)        
+        } else if(ativo.tipo_ativo == 'T'){
+            this._contas[indice].carregarTesouro(ativo)        
+
+        }
     }
 
     //////////////////// FUNÇÕES DE AÇÃO INVESTIDOR ////////////////////
-    comprarAcao(conta: string, acao: AtivoComprado) {
-        let indice = this.consultarIndiceConta(conta);
-        let valor_total = this.consultarAcaoTicket(acao.nome_ativo).valor_ativo;
-        if (indice != -1) {
-            this._contas[indice].comprarAcao(acao, valor_total);
-        }
-    }
+    // comprarAcao(conta: string, acao: AtivoComprado) {
+    //     let indice = this.consultarIndiceConta(conta);
+    //     let valor_total = this.consultarAcaoTicket(acao.nome_ativo).valor_ativo;
+    //     if (indice != -1) {
+    //         this._contas[indice].comprarAcao(acao, valor_total);
+    //     }
+    // }
 
     venderAcao(conta: string, ativo: AtivoComprado) {
         let indice: number = this.consultarIndiceConta(conta);
@@ -191,27 +211,27 @@ class Corretora {
     }
 
     //////////////////// FUNÇÕES DE TESOURO INVESTIDOR ////////////////////
-    comprarTesouro(conta: string, tesouro: AtivoComprado) {
-        let indice = this.consultarIndiceConta(conta);
-        let valor_total = this.consultarTesouroNome(tesouro.nome_ativo).valor_ativo;
-        if (indice != -1) {
-            this._contas[indice].comprarTesouro(tesouro, valor_total);
-        }
-    }
+    // comprarTesouro(conta: string, tesouro: AtivoComprado) {
+    //     let indice = this.consultarIndiceConta(conta);
+    //     let valor_total = this.consultarTesouroNome(tesouro.nome_ativo).valor_ativo;
+    //     if (indice != -1) {
+    //         this._contas[indice].comprarTesouro(tesouro, valor_total);
+    //     }
+    // }
 
-    venderTesouro(conta: string, tesouro: AtivoComprado) {
-        let indice: number = this.consultarIndiceConta(conta);
-        let valor_total = this.consultarTesouroNome(tesouro.nome_ativo).valor_ativo;
+    // venderTesouro(conta: string, tesouro: AtivoComprado) {
+    //     let indice: number = this.consultarIndiceConta(conta);
+    //     let valor_total = this.consultarTesouroNome(tesouro.nome_ativo).valor_ativo;
 
-        if (indice != -1) {
-            this._contas[indice].venderTesouro(tesouro, valor_total);
-        }
-    }
+    //     if (indice != -1) {
+    //         this._contas[indice].venderTesouro(tesouro, valor_total);
+    //     }
+    // }
 
-    carregarTesouro(conta: string, tesouro: AtivoComprado) {
-        let indice: number = this.consultarIndiceConta(conta);
-        this._contas[indice].carregarTesouro(tesouro)
-    }
+    // carregarTesouro(conta: string, tesouro: AtivoComprado) {
+    //     let indice: number = this.consultarIndiceConta(conta);
+    //     this._contas[indice].carregarTesouro(tesouro)
+    // }
 
 
     ////////////////////////// FUNÇÕES EXTRAS //////////////////////////
@@ -286,9 +306,10 @@ class Corretora {
             if (err) throw err;
         });
 
+
+
         for (let i: number = 0; i < this._contas.length; i++) {
-            listaStringsContas = listaStringsContas + this._contas[i].nome + ';' + this._contas[i].saldo + '\n';
-            this._contas[i].atualizarBanco();
+            listaStringsContas = listaStringsContas + this._contas[i].nome + ';' + this._contas[i].saldo + ';' + this._contas[i].senha + '\n';
         }
 
         var contas = require('fs');

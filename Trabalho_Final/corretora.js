@@ -9,6 +9,18 @@ class Corretora {
         this._contas = [];
     }
     //////////////////// FUNÇÕES DE ATIVOS CORRETORA ////////////////////
+    fazerLogin(nome, senha) {
+        let conta_procurada;
+        for (let i = 0; i < this._contas.length; i++) {
+            if (this._contas[i].nome == nome && this._contas[i].senha == senha) {
+                conta_procurada = this._contas[i];
+            }
+        }
+        if (!conta_procurada) {
+            throw new Erros_1.AcaoInexistenteError("Erro de Login.");
+        }
+        return conta_procurada;
+    }
     cadastrarAcao(acao) {
         try {
             this.consultarAcaoTicket(acao.ticket);
@@ -154,18 +166,23 @@ class Corretora {
         let indice = this.consultarIndiceConta(conta);
         this._contas[indice].verCarteira(conta);
     }
-    carregarAtivos(conta, ativo) {
+    carregarCarteira(conta, ativo) {
         let indice = this.consultarIndiceConta(conta);
-        this._contas[indice].carregarAcao(ativo);
-    }
-    //////////////////// FUNÇÕES DE AÇÃO INVESTIDOR ////////////////////
-    comprarAcao(conta, acao) {
-        let indice = this.consultarIndiceConta(conta);
-        let valor_total = this.consultarAcaoTicket(acao.nome_ativo).valor_ativo;
-        if (indice != -1) {
-            this._contas[indice].comprarAcao(acao, valor_total);
+        if (ativo.tipo_ativo == 'A') {
+            this._contas[indice].carregarAcao(ativo);
+        }
+        else if (ativo.tipo_ativo == 'T') {
+            this._contas[indice].carregarTesouro(ativo);
         }
     }
+    //////////////////// FUNÇÕES DE AÇÃO INVESTIDOR ////////////////////
+    // comprarAcao(conta: string, acao: AtivoComprado) {
+    //     let indice = this.consultarIndiceConta(conta);
+    //     let valor_total = this.consultarAcaoTicket(acao.nome_ativo).valor_ativo;
+    //     if (indice != -1) {
+    //         this._contas[indice].comprarAcao(acao, valor_total);
+    //     }
+    // }
     venderAcao(conta, ativo) {
         let indice = this.consultarIndiceConta(conta);
         let valor_total = this.consultarAcaoTicket(ativo.nome_ativo).valor_ativo;
@@ -174,24 +191,24 @@ class Corretora {
         }
     }
     //////////////////// FUNÇÕES DE TESOURO INVESTIDOR ////////////////////
-    comprarTesouro(conta, tesouro) {
-        let indice = this.consultarIndiceConta(conta);
-        let valor_total = this.consultarTesouroNome(tesouro.nome_ativo).valor_ativo;
-        if (indice != -1) {
-            this._contas[indice].comprarTesouro(tesouro, valor_total);
-        }
-    }
-    venderTesouro(conta, tesouro) {
-        let indice = this.consultarIndiceConta(conta);
-        let valor_total = this.consultarTesouroNome(tesouro.nome_ativo).valor_ativo;
-        if (indice != -1) {
-            this._contas[indice].venderTesouro(tesouro, valor_total);
-        }
-    }
-    carregarTesouro(conta, tesouro) {
-        let indice = this.consultarIndiceConta(conta);
-        this._contas[indice].carregarTesouro(tesouro);
-    }
+    // comprarTesouro(conta: string, tesouro: AtivoComprado) {
+    //     let indice = this.consultarIndiceConta(conta);
+    //     let valor_total = this.consultarTesouroNome(tesouro.nome_ativo).valor_ativo;
+    //     if (indice != -1) {
+    //         this._contas[indice].comprarTesouro(tesouro, valor_total);
+    //     }
+    // }
+    // venderTesouro(conta: string, tesouro: AtivoComprado) {
+    //     let indice: number = this.consultarIndiceConta(conta);
+    //     let valor_total = this.consultarTesouroNome(tesouro.nome_ativo).valor_ativo;
+    //     if (indice != -1) {
+    //         this._contas[indice].venderTesouro(tesouro, valor_total);
+    //     }
+    // }
+    // carregarTesouro(conta: string, tesouro: AtivoComprado) {
+    //     let indice: number = this.consultarIndiceConta(conta);
+    //     this._contas[indice].carregarTesouro(tesouro)
+    // }
     ////////////////////////// FUNÇÕES EXTRAS //////////////////////////
     consultarIndiceConta(nome) {
         let indiceProcurado = -1;
@@ -253,8 +270,7 @@ class Corretora {
                 throw err;
         });
         for (let i = 0; i < this._contas.length; i++) {
-            listaStringsContas = listaStringsContas + this._contas[i].nome + ';' + this._contas[i].saldo + '\n';
-            this._contas[i].atualizarBanco();
+            listaStringsContas = listaStringsContas + this._contas[i].nome + ';' + this._contas[i].saldo + ';' + this._contas[i].senha + '\n';
         }
         var contas = require('fs');
         contas.writeFile('contas.txt', listaStringsContas, function (err) {

@@ -1,66 +1,117 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Conta = void 0;
+exports.Investidor = exports.Conta = void 0;
 class Conta {
-    constructor(nome, saldo) {
-        this._acaoComprada = [];
-        this._tesouroComprado = [];
+    // private _acaoComprada: AtivoComprado[] = [];
+    // private _tesouroComprado: AtivoComprado[] = [];
+    // private _ativoComprado: AtivoComprado[] = [];
+    constructor(nome, senha, saldo) {
         this.nome = nome;
         this._saldo = saldo;
+        this._senha = senha;
     }
     get saldo() {
         return this._saldo;
     }
+    get senha() {
+        return this._senha;
+    }
+    atualizaSaldo(valor, tipo) {
+        if (tipo == 1) {
+            this._saldo += valor;
+        }
+        else if (tipo == 0) {
+            this._saldo -= valor;
+        }
+        return this._saldo;
+    }
+}
+exports.Conta = Conta;
+class Investidor extends Conta {
+    constructor(nome, senha, saldo) {
+        super(nome, senha, saldo);
+        this._acaoComprada = [];
+        this._tesouroComprado = [];
+    }
     verCarteira(nome) {
         let ativo_procurado = [];
+        // for (let i = 0; i < this._ativoComprado.length; i++) {
+        //     if (this._ativoComprado[i].nome_conta == nome) {
+        //         ativo_procurado.push(this._ativoComprado[i]);
+        //     }
+        // }
         for (let i = 0; i < this._acaoComprada.length; i++) {
             if (this._acaoComprada[i].nome_conta == nome) {
                 ativo_procurado.push(this._acaoComprada[i]);
             }
         }
-        for (let i = 0; i < this._tesouroComprado.length; i++) {
-            if (this._tesouroComprado[i].nome_conta == nome) {
-                ativo_procurado.push(this._tesouroComprado[i]);
-            }
-        }
+        // for (let i = 0; i < this._tesouroComprado.length; i++) {
+        //     if (this._tesouroComprado[i].nome_conta == nome) {
+        //         ativo_procurado.push(this._tesouroComprado[i]);
+        //     }
+        // }
         console.log(ativo_procurado);
         return ativo_procurado;
     }
     //////////////////// FUNÇÕES DE AÇÃO ////////////////////
     comprarAcao(ativo, valor_total) {
-        let x = -1;
-        valor_total = ativo.quantidade * valor_total;
-        if (this._saldo <= valor_total) {
+        console.log('comprarAcao');
+        if (this.saldo <= valor_total) {
             throw new Error("Saldo Insuficiente");
         }
         else if (ativo.quantidade < 0) {
             throw new Error("Valor precisa ser maior que 0");
         }
+        // for (let i = 0; i < this._ativoComprado.length; i++) {
+        //     if (ativo.nome_conta == this._ativoComprado[i].nome_conta && ativo.nome_ativo == this._ativoComprado[i].nome_ativo){
+        //         this._ativoComprado[i].quantidade += ativo.quantidade; 
+        //         this.atualizaSaldo(valor_total, 0);
+        //         return;
+        //     }
+        // }
+        // this._ativoComprado.push(ativo); 
         for (let i = 0; i < this._acaoComprada.length; i++) {
             if (ativo.nome_conta == this._acaoComprada[i].nome_conta && ativo.nome_ativo == this._acaoComprada[i].nome_ativo) {
                 this._acaoComprada[i].quantidade += ativo.quantidade;
-                this._saldo -= valor_total;
+                this.atualizaSaldo(valor_total, 0);
                 return;
             }
         }
         this._acaoComprada.push(ativo);
-        this._saldo -= valor_total;
+        this.atualizaSaldo(valor_total, 0);
     }
-    venderAcao(tesouro, valor_total) {
-        let indice = this.consultarPorIndiceAcao(tesouro.nome_ativo);
+    venderAcao(ativo, valor_total) {
+        let indice = this.consultarPorIndiceAcao(ativo.nome_ativo);
         if (valor_total < 0) {
             throw new Error("Valor precisa ser maior que 0");
         }
+        // if (indice != -1) {
+        //     for (var i = indice; i < this._ativoComprado.length; i++) {
+        //         this._ativoComprado[i] = this._ativoComprado[i + 1];
+        //     }
+        //     this._ativoComprado.pop();
+        //     this.atualizaSaldo(valor_total, 1);
+        // }
         if (indice != -1) {
-            for (var i = indice; i < this._acaoComprada.length; i++) {
-                this._acaoComprada[i] = this._acaoComprada[i + 1];
+            if (ativo.quantidade == this._acaoComprada[indice].quantidade) {
+                for (var i = indice; i < this._acaoComprada.length; i++) {
+                    this._acaoComprada[i] = this._acaoComprada[i + 1];
+                }
+                this._acaoComprada.pop();
             }
-            this._acaoComprada.pop();
-            this._saldo += valor_total;
+            else {
+                this._acaoComprada[indice].quantidade -= ativo.quantidade;
+            }
+            this.atualizaSaldo(valor_total, 1);
         }
     }
     consultarPorIndiceAcao(nome) {
         let indiceProcurado = -1;
+        // for (let i = 0; i < this._ativoComprado.length; i++) {
+        //     if (this._ativoComprado[i].nome_ativo == nome) {
+        //         indiceProcurado = i;
+        //     }
+        // }
         for (let i = 0; i < this._acaoComprada.length; i++) {
             if (this._acaoComprada[i].nome_ativo == nome) {
                 indiceProcurado = i;
@@ -71,11 +122,13 @@ class Conta {
     carregarAcao(ativo) {
         this._acaoComprada.push(ativo);
     }
+    // carregarAtivo(ativo: AtivoComprado): void {
+    //     this._ativoComprado.push(ativo);
+    // }
     //////////////////// FUNÇÕES DE TESOURO ////////////////////
     comprarTesouro(tesouro, valor_total) {
-        let x = -1;
         valor_total = tesouro.quantidade * valor_total;
-        if (this._saldo <= valor_total) {
+        if (this.saldo <= valor_total) {
             throw new Error("Saldo Insuficiente");
         }
         else if (tesouro.quantidade < 0) {
@@ -84,12 +137,12 @@ class Conta {
         for (let i = 0; i < this._tesouroComprado.length; i++) {
             if (tesouro.nome_conta == this._tesouroComprado[i].nome_conta && tesouro.nome_ativo == this._tesouroComprado[i].nome_ativo) {
                 this._tesouroComprado[i].quantidade += tesouro.quantidade;
-                this._saldo -= valor_total;
+                this.atualizaSaldo(valor_total, 0);
                 return;
             }
         }
         this._tesouroComprado.push(tesouro);
-        this._saldo -= valor_total;
+        this.atualizaSaldo(valor_total, 0);
     }
     venderTesouro(tesouro, valor_total) {
         let indice = this.consultarPorIndiceTesouro(tesouro.nome_ativo);
@@ -97,17 +150,23 @@ class Conta {
             throw new Error("Valor precisa ser maior que 0");
         }
         if (indice != -1) {
-            for (var i = indice; i < this._acaoComprada.length; i++) {
-                this._acaoComprada[i] = this._acaoComprada[i + 1];
+            if (tesouro.quantidade == this._tesouroComprado[indice].quantidade) {
+                for (var i = indice; i < this._tesouroComprado.length; i++) {
+                    this._tesouroComprado[i] = this._tesouroComprado[i + 1];
+                }
+                this._tesouroComprado.pop();
             }
-            this._acaoComprada.pop();
-            this._saldo += valor_total;
+            else {
+                this._tesouroComprado[indice].quantidade -= tesouro.quantidade;
+            }
+            this._tesouroComprado.pop();
+            this.atualizaSaldo(valor_total, 1);
         }
     }
     consultarPorIndiceTesouro(nome) {
         let indiceProcurado = -1;
-        for (let i = 0; i < this._acaoComprada.length; i++) {
-            if (this._acaoComprada[i].nome_ativo == nome) {
+        for (let i = 0; i < this._tesouroComprado.length; i++) {
+            if (this._tesouroComprado[i].nome_ativo == nome) {
                 indiceProcurado = i;
             }
         }
@@ -120,16 +179,16 @@ class Conta {
     atualizarBanco() {
         let listaStringsCarteiras = '';
         for (let i = 0; i < this._acaoComprada.length; i++) {
-            listaStringsCarteiras = listaStringsCarteiras + this._acaoComprada[i].nome_conta + ';' + this._acaoComprada[i].nome_ativo + ';' + this._acaoComprada[i].quantidade + '\n';
+            listaStringsCarteiras = listaStringsCarteiras + this._acaoComprada[i].nome_conta + ';' + this._acaoComprada[i].nome_ativo + ';' + this._acaoComprada[i].quantidade + ';A' + '\n';
         }
         for (let i = 0; i < this._tesouroComprado.length; i++) {
-            listaStringsCarteiras = listaStringsCarteiras + this._tesouroComprado[i].nome_conta + ';' + this._tesouroComprado[i].nome_ativo + ';' + this._tesouroComprado[i].quantidade + '\n';
+            listaStringsCarteiras = listaStringsCarteiras + this._tesouroComprado[i].nome_conta + ';' + this._tesouroComprado[i].nome_ativo + ';' + this._tesouroComprado[i].quantidade + ';T' + '\n';
         }
         var carteiras = require('fs');
-        carteiras.writeFile('carteiras.txt', listaStringsCarteiras, function (err) {
+        carteiras.writeFile('carteira_' + this.nome + '.txt', listaStringsCarteiras, function (err) {
             if (err)
                 throw err;
         });
     }
 }
-exports.Conta = Conta;
+exports.Investidor = Investidor;

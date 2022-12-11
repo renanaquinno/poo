@@ -4,20 +4,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const prompt_sync_1 = __importDefault(require("prompt-sync"));
-const Corretora_1 = require("./Corretora");
+const corretora_1 = require("./corretora");
 const Acao_1 = require("./Acao");
 const TesouroDireto_1 = require("./TesouroDireto");
 const Conta_1 = require("./Conta");
 const AtivoComprado_1 = require("./AtivoComprado");
 const input = (0, prompt_sync_1.default)();
-var c = new Corretora_1.Corretora();
+var c = new corretora_1.Corretora();
+let usuario;
 carregarAtivos();
 carregarContas();
-carregarCarteiras();
 let opcao = '';
 do {
     console.log('\nEntrar no Sistema \nDigite uma opção:');
-    console.log('1 - Entrar Como Corretora    2 - Entrar Como Investidor   3 - Cadastrar Conta 9 - Sair\n');
+    console.log('1 - Gerenciar Ativos  2 - Entrar como Investidor  3 - Cadastrar Conta  9 - Sair\n');
     opcao = input("Opção:");
     switch (opcao) {
         case "1":
@@ -42,28 +42,11 @@ do {
             } while (opcao != "0");
             break;
         case "2":
-            do {
-                console.log('\nBem vindo ao Sistema de Gerenciamento de Ativos - Menu Investidor\nDigite uma opção:');
-                console.log('1 - Comprar Ativo    2 - Vender Ativo    3 - Consultar Ativos  4 - Ver Carteira  0 - Sair\n');
-                opcao = input("Opção:");
-                switch (opcao) {
-                    case "1":
-                        comprarAtivos();
-                        break;
-                    case "2":
-                        venderAtivos();
-                        break;
-                    case "3":
-                        consultarAtivos();
-                        break;
-                    case "4":
-                        verCarteira();
-                        break;
-                }
-            } while (opcao != "0");
+            login();
             break;
         case "3":
             cadastrarConta();
+            break;
     }
 } while (opcao != "9");
 atualizarBancoDeDados();
@@ -197,14 +180,42 @@ function editarTesouro() {
     }
 }
 //////////////////// FUNÇÕES DE ATIVOS INVESTIDOR ////////////////////
+function login() {
+    console.log("FAZER LOGIN");
+    var user = input('USUARIO: ').toLocaleUpperCase();
+    var senha = input('SENHA: ').toLocaleUpperCase();
+    usuario = c.fazerLogin(user, senha);
+    if (usuario != null) {
+        carregarCarteirasuUsuario(usuario.nome);
+        do {
+            console.log('\nBem vindo ao Sistema da Corretora - Menu Investidor\nDigite uma opção:');
+            console.log('1 - Comprar Ativo    2 - Vender Ativo    3 - Consultar Ativos  4 - Ver Carteira  0 - Sair\n');
+            opcao = input("Opção:");
+            switch (opcao) {
+                case "1":
+                    comprarAtivos();
+                    break;
+                case "2":
+                    venderAtivos();
+                    break;
+                case "3":
+                    consultarAtivos();
+                    break;
+                case "4":
+                    verCarteira(usuario.nome);
+                    break;
+            }
+        } while (opcao != "0");
+    }
+}
 function comprarAtivos() {
     console.log("\n Comprar Ativo\n");
     var tipo = input('Deseja Comprar Ação (A) ou Tesouro Direto (T) - Digite A ou T: ').toLocaleUpperCase();
     if (tipo == 'A') {
-        comprarAcao();
+        comprarAcao(usuario.nome);
     }
     else if (tipo == 'T') {
-        comprarTesouro();
+        comprarTesouro(usuario.nome);
     }
     else {
         console.log("\nOpção Invalida\n");
@@ -215,69 +226,74 @@ function venderAtivos() {
     console.log("\n Vender Ativo\n");
     var tipo = input('Deseja Comprar Ação (A) ou Tesouro Direto (T) - Digite A ou T: ').toLocaleUpperCase();
     if (tipo == 'A') {
-        venderAcao();
+        venderAcao(usuario.nome);
     }
     else if (tipo == 'T') {
-        venderTesouro();
+        venderTesouro(usuario.nome);
     }
     else {
         console.log("\nOpção Invalida\n");
         venderAtivos();
     }
 }
-function verCarteira() {
+function verCarteira(usuario_nome) {
     console.log("\nVer Carteira\n");
-    let nome_conta = input('Nome do Usuario: ').toLocaleUpperCase();
-    c.verCarteira(nome_conta);
+    c.verCarteira(usuario_nome);
 }
 //////////////////// FUNÇÕES DE AÇÃO INVESTIDOR ////////////////////
-function comprarAcao() {
+function comprarAcao(usuario_nome) {
     console.log("\nComprar Ação\n");
     let nome_ativo = input('Digite o Ticket da Ação: ').toLocaleUpperCase();
     let quantidade_acoes = input('Digite a Quantidade de Ações: ');
-    let nome_conta = input('Nome do Usuario: ').toLocaleUpperCase();
-    let ativo_comprado = new AtivoComprado_1.AtivoComprado(nome_conta, nome_ativo, parseInt(quantidade_acoes));
-    c.comprarAcao(nome_conta, ativo_comprado);
+    let ativo_comprado = new AtivoComprado_1.AtivoComprado(usuario_nome, nome_ativo, parseInt(quantidade_acoes), 'A');
+    let info = c.consultarAcaoTicket(nome_ativo);
+    let valor_total = (info.valor_ativo * parseFloat(quantidade_acoes));
+    usuario.comprarAcao(ativo_comprado, valor_total);
 }
-function venderAcao() {
+function venderAcao(usuario_nome) {
     console.log("\nVender Ação\n");
     let nome_ativo = input('Digite o Ticket da Ação: ').toLocaleUpperCase();
     let quantidade_acoes = input('Digite a Quantidade de Ações: ');
-    let nome_conta = input('Nome do Usuario: ').toLocaleUpperCase();
-    let acao_vendida = new AtivoComprado_1.AtivoComprado(nome_conta, nome_ativo, parseInt(quantidade_acoes));
-    c.venderAcao(nome_conta, acao_vendida);
+    let acao_vendida = new AtivoComprado_1.AtivoComprado(usuario_nome, nome_ativo, parseInt(quantidade_acoes), 'A');
+    let info = c.consultarAcaoTicket(nome_ativo);
+    let valor_total = (info.valor_ativo * parseFloat(quantidade_acoes));
+    usuario.venderAcao(acao_vendida, valor_total);
 }
 //////////////////// FUNÇÕES DE TESOURO INVESTIDOR ////////////////////
-function comprarTesouro() {
+function comprarTesouro(nome_conta) {
     console.log("\nComprar Tesouro\n");
     let nome_ativo = input('Digite o Nome do Tesouro: ').toLocaleUpperCase();
     let quantidade = input('Digite a Quantidade: ');
-    let nome_conta = input('Nome do Usuario: ').toLocaleUpperCase();
-    let tesouro_comprado = new AtivoComprado_1.AtivoComprado(nome_conta, nome_ativo, parseInt(quantidade));
-    c.comprarTesouro(nome_conta, tesouro_comprado);
+    let tesouro_comprado = new AtivoComprado_1.AtivoComprado(nome_conta, nome_ativo, parseInt(quantidade), 'T');
+    let info = c.consultarTesouroNome(nome_ativo);
+    let valor_total = (info.valor_ativo * parseFloat(quantidade));
+    usuario.comprarTesouro(tesouro_comprado, valor_total);
 }
-function venderTesouro() {
+function venderTesouro(nome_conta) {
     console.log("\nVender Tesouro\n");
     let nome_ativo = input('Digite o Nome do Tesouro: ').toLocaleUpperCase();
     let quantidade = input('Digite a Quantidade: ');
-    let nome_conta = input('Nome do Usuario: ').toLocaleUpperCase();
-    let tesouro_comprado = new AtivoComprado_1.AtivoComprado(nome_conta, nome_ativo, parseInt(quantidade));
-    c.venderTesouro(nome_conta, tesouro_comprado);
+    let tesouro_vendido = new AtivoComprado_1.AtivoComprado(nome_conta, nome_ativo, parseInt(quantidade), 'T');
+    let info = c.consultarTesouroNome(nome_ativo);
+    let valor_total = (info.valor_ativo * parseFloat(quantidade));
+    usuario.venderAcao(tesouro_vendido, valor_total);
 }
 //////////////////// FUNÇÕES SISTEMA ////////////////////
 function atualizarBancoDeDados() {
     c.atualizarBancoDeDados();
+    usuario.atualizarBanco();
 }
 function cadastrarConta() {
     let nome = input('Nome: ').toLocaleUpperCase();
+    let senha = input('Senha: ').toLocaleUpperCase();
     let saldo = input('Saldo Inicial: ').toLocaleUpperCase();
-    let conta = new Conta_1.Conta(nome, parseFloat(saldo));
+    let conta = new Conta_1.Investidor(nome, senha, parseFloat(saldo));
     c.cadastrarConta(conta);
 }
 function carregarAtivos() {
     let LineReaderSync = require("line-reader-sync");
     let lrs = new LineReaderSync("./ativos.txt");
-    console.log("Iniciando leitura de arquivo");
+    console.log("Iniciando Banco de Dados\n");
     while (true) {
         let linha = lrs.readline();
         if (linha != null) {
@@ -306,6 +322,7 @@ function carregarAtivos() {
             break;
         }
     }
+    console.log("---- ATIVOS CARREGADOS ----\n");
 }
 function carregarContas() {
     let LineReaderSync = require("line-reader-sync");
@@ -317,8 +334,9 @@ function carregarContas() {
             let array = conta_bd.split(";");
             let nome_conta = array[0].toUpperCase();
             let saldo = parseFloat(array[1]);
-            ativo_comprado = new AtivoComprado_1.AtivoComprado(nome_conta, 'AAAA', 0);
-            let conta = new Conta_1.Conta(nome_conta, saldo, ativo_comprado);
+            let senha = array[2];
+            ativo_comprado = new AtivoComprado_1.AtivoComprado(nome_conta, 'AAAA', 0, '');
+            let conta = new Conta_1.Investidor(nome_conta, senha, saldo);
             c.cadastrarConta(conta);
             console.log('Conta Lida: ' + conta.nome);
         }
@@ -326,10 +344,23 @@ function carregarContas() {
             break;
         }
     }
+    console.log("---- CONTAS CARREGADAS ----\n");
 }
-function carregarCarteiras() {
+function carregarCarteirasuUsuario(nome_conta) {
     let LineReaderSync = require("line-reader-sync");
-    let carteiras = new LineReaderSync("./carteiras.txt");
+    let fs = require('fs');
+    let carteiras;
+    try {
+        carteiras = new LineReaderSync("./carteira_" + nome_conta + ".txt");
+    }
+    catch (error) {
+        let conteudo = '';
+        fs.writeFile("./carteira_" + nome_conta + ".txt", conteudo, function (err) {
+            if (err)
+                throw err;
+        });
+        carteiras = new LineReaderSync("./carteira_" + nome_conta + ".txt");
+    }
     while (true) {
         let carteira = carteiras.readline();
         if (carteira != null) {
@@ -337,12 +368,12 @@ function carregarCarteiras() {
             let nome_conta = array[0].toUpperCase();
             let ticket = array[1];
             let quantidade = parseFloat(array[2]);
-            let ativo_comprado = new AtivoComprado_1.AtivoComprado(nome_conta, ticket, quantidade);
-            c.carregarAtivos(nome_conta, ativo_comprado);
-            console.log('Carteira Lida: ' + nome_conta);
+            let tipo = array[3].toUpperCase();
+            let ativo_comprado = new AtivoComprado_1.AtivoComprado(nome_conta, ticket, quantidade, tipo);
+            usuario.carregarAcao(ativo_comprado);
+            console.log('CARTEIRA CARREGADA: ' + nome_conta);
         }
         else {
-            console.log("Dados Carregados!!");
             break;
         }
     }
