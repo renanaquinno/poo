@@ -161,80 +161,18 @@ class Corretora {
             this._homeBrokerTesouro.pop();
         }
     }
-    //////////////////// FUNÇÕES DE ATIVO ////////////////////
-    // verCarteira(conta: string) {
-    //     let indice = this.consultarIndiceConta(conta);
-    //     this._contas[indice].verCarteira(conta);
-    // }
-    // carregarCarteira(conta: string, ativo: AtivoComprado) {
-    // let indice: number = this.consultarIndiceConta(conta);
-    // this._contas[indice].carregarAtivo(ativo)        
-    // if (ativo.tipo_ativo == 'A'){
-    //     this._contas[indice].carregarAcao(ativo)        
-    // } else if(ativo.tipo_ativo == 'T'){
-    //     this._contas[indice].carregarTesouro(ativo)        
-    // }
-    // }
-    //////////////////// FUNÇÕES DE AÇÃO INVESTIDOR ////////////////////
-    // comprarAcao(conta: string, acao: AtivoComprado) {
-    //     let indice = this.consultarIndiceConta(conta);
-    //     let valor_total = this.consultarAcaoTicket(acao.nome_ativo).valor_ativo;
-    //     if (indice != -1) {
-    //         this._contas[indice].comprarAcao(acao, valor_total);
-    //     }
-    // }
-    // venderAcao(conta: string, ativo: AtivoComprado) {
-    //     let indice: number = this.consultarIndiceConta(conta);
-    //     let valor_total = this.consultarAcaoTicket(ativo.nome_ativo).valor_ativo;
-    //     if (indice != -1) {
-    //         this._contas[indice].venderAcao(ativo, valor_total);
-    //     }
-    // }
-    //////////////////// FUNÇÕES DE TESOURO INVESTIDOR ////////////////////
-    // comprarTesouro(conta: string, tesouro: AtivoComprado) {
-    //     let indice = this.consultarIndiceConta(conta);
-    //     let valor_total = this.consultarTesouroNome(tesouro.nome_ativo).valor_ativo;
-    //     if (indice != -1) {
-    //         this._contas[indice].comprarTesouro(tesouro, valor_total);
-    //     }
-    // }
-    // venderTesouro(conta: string, tesouro: AtivoComprado) {
-    //     let indice: number = this.consultarIndiceConta(conta);
-    //     let valor_total = this.consultarTesouroNome(tesouro.nome_ativo).valor_ativo;
-    //     if (indice != -1) {
-    //         this._contas[indice].venderTesouro(tesouro, valor_total);
-    //     }
-    // }
-    // carregarTesouro(conta: string, tesouro: AtivoComprado) {
-    //     let indice: number = this.consultarIndiceConta(conta);
-    //     this._contas[indice].carregarTesouro(tesouro)
-    // }
-    ////////////////////////// FUNÇÕES EXTRAS //////////////////////////
-    // consultarIndiceConta(nome: string): number {
-    //     let indiceProcurado: number = -1;
-    //     for (let i = 0; i < this._contas.length; i++) {
-    //         if (this._contas[i].nome == nome) {
-    //             indiceProcurado = i;
-    //         }
-    //     }
-    //     if (indiceProcurado == -1) {
-    //         throw new AcaoInexistenteError("Conta Inexistente, Verifique o Nome Informado.")
-    //     }
-    //     return indiceProcurado;
-    // }
-    // consultarConta(nome: string): Conta {
-    //     let contaProcurada!: Conta;
-    //     for (let i = 0; i < this._contas.length; i++) {
-    //         if (this._contas[i].nome == nome) {
-    //             contaProcurada = this._contas[i];
-    //         }
-    //     }
-    //     return contaProcurada;
-    // }
+    listarContas() {
+        let listaStringContas = '';
+        for (let i = 0; i < this._contas.length; i++) {
+            listaStringContas = listaStringContas +
+                ' Nome: ' + this._contas[i].nome +
+                ' - Saldo: ' + this._contas[i].saldo + '\n';
+        }
+        return listaStringContas;
+    }
     listarAtivos() {
         let listaStringAcoes = '\nAÇÕES:\n';
         let listaStringTesouro = '\nTESOURO:\n';
-        let listaStringContas = '\nCONTAS:\n';
         for (let i = 0; i < this._homeBroker.length; i++) {
             listaStringAcoes = listaStringAcoes +
                 ' - Empresa: ' + this._homeBroker[i].nome_ativo +
@@ -248,12 +186,7 @@ class Corretora {
                 ' - Vencimento: ' + this._homeBrokerTesouro[i].data_vencimento +
                 ' - Rentabilidade Anual: ' + this._homeBrokerTesouro[i].rentabilidade_anual + '\n';
         }
-        for (let i = 0; i < this._contas.length; i++) {
-            listaStringContas = listaStringContas +
-                ' Nome: ' + this._contas[i].nome +
-                ' - Saldo: ' + this._contas[i].saldo + '\n';
-        }
-        return listaStringAcoes + listaStringTesouro + listaStringContas;
+        return listaStringAcoes + listaStringTesouro;
     }
     atualizarBancoDeDados() {
         let listaStrings = '';
