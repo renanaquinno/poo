@@ -162,19 +162,19 @@ class Corretora {
         }
     }
     //////////////////// FUNÇÕES DE ATIVO ////////////////////
-    verCarteira(conta) {
-        let indice = this.consultarIndiceConta(conta);
-        this._contas[indice].verCarteira(conta);
-    }
-    carregarCarteira(conta, ativo) {
-        let indice = this.consultarIndiceConta(conta);
-        if (ativo.tipo_ativo == 'A') {
-            this._contas[indice].carregarAcao(ativo);
-        }
-        else if (ativo.tipo_ativo == 'T') {
-            this._contas[indice].carregarTesouro(ativo);
-        }
-    }
+    // verCarteira(conta: string) {
+    //     let indice = this.consultarIndiceConta(conta);
+    //     this._contas[indice].verCarteira(conta);
+    // }
+    // carregarCarteira(conta: string, ativo: AtivoComprado) {
+    // let indice: number = this.consultarIndiceConta(conta);
+    // this._contas[indice].carregarAtivo(ativo)        
+    // if (ativo.tipo_ativo == 'A'){
+    //     this._contas[indice].carregarAcao(ativo)        
+    // } else if(ativo.tipo_ativo == 'T'){
+    //     this._contas[indice].carregarTesouro(ativo)        
+    // }
+    // }
     //////////////////// FUNÇÕES DE AÇÃO INVESTIDOR ////////////////////
     // comprarAcao(conta: string, acao: AtivoComprado) {
     //     let indice = this.consultarIndiceConta(conta);
@@ -183,13 +183,13 @@ class Corretora {
     //         this._contas[indice].comprarAcao(acao, valor_total);
     //     }
     // }
-    venderAcao(conta, ativo) {
-        let indice = this.consultarIndiceConta(conta);
-        let valor_total = this.consultarAcaoTicket(ativo.nome_ativo).valor_ativo;
-        if (indice != -1) {
-            this._contas[indice].venderAcao(ativo, valor_total);
-        }
-    }
+    // venderAcao(conta: string, ativo: AtivoComprado) {
+    //     let indice: number = this.consultarIndiceConta(conta);
+    //     let valor_total = this.consultarAcaoTicket(ativo.nome_ativo).valor_ativo;
+    //     if (indice != -1) {
+    //         this._contas[indice].venderAcao(ativo, valor_total);
+    //     }
+    // }
     //////////////////// FUNÇÕES DE TESOURO INVESTIDOR ////////////////////
     // comprarTesouro(conta: string, tesouro: AtivoComprado) {
     //     let indice = this.consultarIndiceConta(conta);
@@ -210,27 +210,27 @@ class Corretora {
     //     this._contas[indice].carregarTesouro(tesouro)
     // }
     ////////////////////////// FUNÇÕES EXTRAS //////////////////////////
-    consultarIndiceConta(nome) {
-        let indiceProcurado = -1;
-        for (let i = 0; i < this._contas.length; i++) {
-            if (this._contas[i].nome == nome) {
-                indiceProcurado = i;
-            }
-        }
-        if (indiceProcurado == -1) {
-            throw new Erros_1.AcaoInexistenteError("Conta Inexistente, Verifique o Nome Informado.");
-        }
-        return indiceProcurado;
-    }
-    consultarConta(nome) {
-        let contaProcurada;
-        for (let i = 0; i < this._contas.length; i++) {
-            if (this._contas[i].nome == nome) {
-                contaProcurada = this._contas[i];
-            }
-        }
-        return contaProcurada;
-    }
+    // consultarIndiceConta(nome: string): number {
+    //     let indiceProcurado: number = -1;
+    //     for (let i = 0; i < this._contas.length; i++) {
+    //         if (this._contas[i].nome == nome) {
+    //             indiceProcurado = i;
+    //         }
+    //     }
+    //     if (indiceProcurado == -1) {
+    //         throw new AcaoInexistenteError("Conta Inexistente, Verifique o Nome Informado.")
+    //     }
+    //     return indiceProcurado;
+    // }
+    // consultarConta(nome: string): Conta {
+    //     let contaProcurada!: Conta;
+    //     for (let i = 0; i < this._contas.length; i++) {
+    //         if (this._contas[i].nome == nome) {
+    //             contaProcurada = this._contas[i];
+    //         }
+    //     }
+    //     return contaProcurada;
+    // }
     listarAtivos() {
         let listaStringAcoes = '\nAÇÕES:\n';
         let listaStringTesouro = '\nTESOURO:\n';

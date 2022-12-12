@@ -177,20 +177,20 @@ class Corretora {
 
 
     //////////////////// FUNÇÕES DE ATIVO ////////////////////
-    verCarteira(conta: string) {
-        let indice = this.consultarIndiceConta(conta);
-        this._contas[indice].verCarteira(conta);
-    }
+    // verCarteira(conta: string) {
+    //     let indice = this.consultarIndiceConta(conta);
+    //     this._contas[indice].verCarteira(conta);
+    // }
 
-    carregarCarteira(conta: string, ativo: AtivoComprado) {
-        let indice: number = this.consultarIndiceConta(conta);
-        if (ativo.tipo_ativo == 'A'){
-            this._contas[indice].carregarAcao(ativo)        
-        } else if(ativo.tipo_ativo == 'T'){
-            this._contas[indice].carregarTesouro(ativo)        
-
-        }
-    }
+    // carregarCarteira(conta: string, ativo: AtivoComprado) {
+        // let indice: number = this.consultarIndiceConta(conta);
+        // this._contas[indice].carregarAtivo(ativo)        
+        // if (ativo.tipo_ativo == 'A'){
+        //     this._contas[indice].carregarAcao(ativo)        
+        // } else if(ativo.tipo_ativo == 'T'){
+        //     this._contas[indice].carregarTesouro(ativo)        
+        // }
+    // }
 
     //////////////////// FUNÇÕES DE AÇÃO INVESTIDOR ////////////////////
     // comprarAcao(conta: string, acao: AtivoComprado) {
@@ -201,14 +201,14 @@ class Corretora {
     //     }
     // }
 
-    venderAcao(conta: string, ativo: AtivoComprado) {
-        let indice: number = this.consultarIndiceConta(conta);
-        let valor_total = this.consultarAcaoTicket(ativo.nome_ativo).valor_ativo;
+    // venderAcao(conta: string, ativo: AtivoComprado) {
+    //     let indice: number = this.consultarIndiceConta(conta);
+    //     let valor_total = this.consultarAcaoTicket(ativo.nome_ativo).valor_ativo;
 
-        if (indice != -1) {
-            this._contas[indice].venderAcao(ativo, valor_total);
-        }
-    }
+    //     if (indice != -1) {
+    //         this._contas[indice].venderAcao(ativo, valor_total);
+    //     }
+    // }
 
     //////////////////// FUNÇÕES DE TESOURO INVESTIDOR ////////////////////
     // comprarTesouro(conta: string, tesouro: AtivoComprado) {
@@ -236,29 +236,29 @@ class Corretora {
 
     ////////////////////////// FUNÇÕES EXTRAS //////////////////////////
 
-    consultarIndiceConta(nome: string): number {
-        let indiceProcurado: number = -1;
-        for (let i = 0; i < this._contas.length; i++) {
-            if (this._contas[i].nome == nome) {
-                indiceProcurado = i;
-            }
-        }
-        if (indiceProcurado == -1) {
-            throw new AcaoInexistenteError("Conta Inexistente, Verifique o Nome Informado.")
-        }
-        return indiceProcurado;
-    }
+    // consultarIndiceConta(nome: string): number {
+    //     let indiceProcurado: number = -1;
+    //     for (let i = 0; i < this._contas.length; i++) {
+    //         if (this._contas[i].nome == nome) {
+    //             indiceProcurado = i;
+    //         }
+    //     }
+    //     if (indiceProcurado == -1) {
+    //         throw new AcaoInexistenteError("Conta Inexistente, Verifique o Nome Informado.")
+    //     }
+    //     return indiceProcurado;
+    // }
 
 
-    consultarConta(nome: string): Conta {
-        let contaProcurada!: Conta;
-        for (let i = 0; i < this._contas.length; i++) {
-            if (this._contas[i].nome == nome) {
-                contaProcurada = this._contas[i];
-            }
-        }
-        return contaProcurada;
-    }
+    // consultarConta(nome: string): Conta {
+    //     let contaProcurada!: Conta;
+    //     for (let i = 0; i < this._contas.length; i++) {
+    //         if (this._contas[i].nome == nome) {
+    //             contaProcurada = this._contas[i];
+    //         }
+    //     }
+    //     return contaProcurada;
+    // }
 
     listarAtivos(): string {
         let listaStringAcoes = '\nAÇÕES:\n';

@@ -22,7 +22,7 @@ do {
     switch (opcao) {
         case "1":
             do {
-                console.log('\nBem vindo ao Sistema de Gerenciamento de Ativos - Menu Corretora\nDigite uma opção:');
+                console.log('\nBem vindo ao Sistema de Gerenciamento de Ativos - Menu Gerenciar\nDigite uma opção:');
                 console.log('1 - Cadastrar Ativo    2 - Editar Ativo    3 - Excluir Ativo  4 - Consultar Ativos  0 - Sair\n');
                 opcao = input("Opção:");
                 switch (opcao) {
@@ -237,8 +237,8 @@ function venderAtivos() {
     }
 }
 function verCarteira(usuario_nome) {
-    console.log("\nVer Carteira\n");
-    c.verCarteira(usuario_nome);
+    console.log("\n ------ Ver Carteira ------\n");
+    console.log(usuario.verCarteira(usuario_nome));
 }
 //////////////////// FUNÇÕES DE AÇÃO INVESTIDOR ////////////////////
 function comprarAcao(usuario_nome) {
@@ -370,10 +370,10 @@ function carregarCarteirasuUsuario(nome_conta) {
             let quantidade = parseFloat(array[2]);
             let tipo = array[3].toUpperCase();
             let ativo_comprado = new AtivoComprado_1.AtivoComprado(nome_conta, ticket, quantidade, tipo);
-            usuario.carregarAcao(ativo_comprado);
-            console.log('CARTEIRA CARREGADA: ' + nome_conta);
+            usuario.carregarAtivo(ativo_comprado);
         }
         else {
+            console.log('CARTEIRA CARREGADA: ' + nome_conta);
             break;
         }
     }

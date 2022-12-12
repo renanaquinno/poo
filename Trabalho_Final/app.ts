@@ -2,7 +2,7 @@ import prompt from "prompt-sync";
 import { Corretora } from "./corretora";
 import { Acao } from "./Acao";
 import { TesouroDireto } from "./TesouroDireto";
-import { Conta, Investidor } from "./Conta";
+import { Investidor } from "./Conta";
 import { AtivoComprado } from "./AtivoComprado";
 
 const input = prompt();
@@ -21,7 +21,7 @@ do {
     switch (opcao) {
         case "1":
             do {
-                console.log('\nBem vindo ao Sistema de Gerenciamento de Ativos - Menu Corretora\nDigite uma opção:');
+                console.log('\nBem vindo ao Sistema de Gerenciamento de Ativos - Menu Gerenciar\nDigite uma opção:');
                 console.log('1 - Cadastrar Ativo    2 - Editar Ativo    3 - Excluir Ativo  4 - Consultar Ativos  0 - Sair\n');
                 opcao = input("Opção:");
                 switch (opcao) {
@@ -245,8 +245,8 @@ function login() {
     }
 
     function verCarteira(usuario_nome: string) {
-        console.log("\nVer Carteira\n");
-        c.verCarteira(usuario_nome);
+        console.log("\n ------ Ver Carteira ------\n");
+        console.log(usuario.verCarteira(usuario_nome));
     }
 
     //////////////////// FUNÇÕES DE AÇÃO INVESTIDOR ////////////////////
@@ -389,10 +389,9 @@ function login() {
                 let tipo: string = array[3].toUpperCase();
 
                 let ativo_comprado = new AtivoComprado(nome_conta, ticket, quantidade, tipo);
-                usuario.carregarAcao(ativo_comprado);
-                
-                console.log('CARTEIRA CARREGADA: ' + nome_conta);
+                usuario.carregarAtivo(ativo_comprado);
             } else {
+                console.log('CARTEIRA CARREGADA: ' + nome_conta);
                 break
             }
         }
