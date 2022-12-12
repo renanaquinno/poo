@@ -3,7 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Investidor = exports.Conta = void 0;
 const Erros_1 = require("./Erros");
 class Conta {
-    constructor(nome, senha, saldo) {
+    constructor(id, nome, senha, saldo) {
+        this.id = id;
         this.nome = nome;
         this._saldo = saldo;
         this._senha = senha;
@@ -26,8 +27,8 @@ class Conta {
 }
 exports.Conta = Conta;
 class Investidor extends Conta {
-    constructor(nome, senha, saldo) {
-        super(nome, senha, saldo);
+    constructor(id, nome, senha, saldo) {
+        super(id, nome, senha, saldo);
         this._ativoComprado = [];
     }
     operarAtivo(ativo, valor_total, tipo_operacao) {
@@ -39,7 +40,7 @@ class Investidor extends Conta {
                 throw new Erros_1.QuantidadeInsuficienteError("Quantidade precisa ser maior que 0");
             }
             for (let i = 0; i < this._ativoComprado.length; i++) {
-                if (ativo.nome_conta == this._ativoComprado[i].nome_conta && ativo.nome_ativo == this._ativoComprado[i].nome_ativo) {
+                if (ativo.nome_conta == this._ativoComprado[i].nome_conta && ativo.id == this._ativoComprado[i].id) {
                     this._ativoComprado[i].quantidade += ativo.quantidade;
                     this.atualizaSaldo(valor_total, 0);
                     return;
@@ -49,7 +50,7 @@ class Investidor extends Conta {
             this.atualizaSaldo(valor_total, 0);
         }
         else {
-            let indice = this.consultarPorIndiceAcao(ativo.nome_ativo);
+            let indice = this.consultarPorIndiceAtivo(ativo.id);
             if (valor_total < 0) {
                 throw new Erros_1.QuantidadeInsuficienteError("Quantidade precisa ser maior que 0");
             }
@@ -70,19 +71,10 @@ class Investidor extends Conta {
             }
         }
     }
-    consultarPorIndiceAcao(nome) {
+    consultarPorIndiceAtivo(id_ativo) {
         let indiceProcurado = -1;
         for (let i = 0; i < this._ativoComprado.length; i++) {
-            if (this._ativoComprado[i].nome_ativo == nome) {
-                indiceProcurado = i;
-            }
-        }
-        return indiceProcurado;
-    }
-    consultarPorIndiceTesouro(nome) {
-        let indiceProcurado = -1;
-        for (let i = 0; i < this._ativoComprado.length; i++) {
-            if (this._ativoComprado[i].nome_ativo == nome) {
+            if (this._ativoComprado[i].id == id_ativo) {
                 indiceProcurado = i;
             }
         }
@@ -104,7 +96,7 @@ class Investidor extends Conta {
     atualizarBanco() {
         let listaStringsCarteiras = '';
         for (let i = 0; i < this._ativoComprado.length; i++) {
-            listaStringsCarteiras = listaStringsCarteiras + this._ativoComprado[i].nome_conta + ';' + this._ativoComprado[i].nome_ativo + ';' + this._ativoComprado[i].quantidade + ';' + this._ativoComprado[i].tipo_ativo + '\n';
+            listaStringsCarteiras = listaStringsCarteiras + this._ativoComprado[i].id + ';' + this._ativoComprado[i].nome_conta + ';' + this._ativoComprado[i].nome_empresa + ';' + this._ativoComprado[i].quantidade + ';' + this._ativoComprado[i].tipo_ativo + '\n';
         }
         var carteiras = require('fs');
         carteiras.writeFile('carteira_' + this.nome + '.txt', listaStringsCarteiras, function (err) {

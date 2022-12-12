@@ -23,7 +23,7 @@ class Corretora {
     }
     cadastrarAcao(acao) {
         try {
-            this.consultarAcaoTicket(acao.ticket);
+            this.consultarAcaoId(acao.id);
         }
         catch (e) {
             if (e instanceof Erros_1.AcaoInexistenteError) {
@@ -36,7 +36,7 @@ class Corretora {
     }
     cadastrarTesouro(tesouro) {
         try {
-            this.consultarAcaoTicket(tesouro.nome_ativo);
+            this.consultarTesouroId(tesouro.id);
         }
         catch (e) {
             if (e instanceof Erros_1.AcaoInexistenteError) {
@@ -49,10 +49,10 @@ class Corretora {
     }
     cadastrarConta(conta) {
         try {
-            this.consultarAcaoTicket(conta.nome);
+            this.consultarConta(conta.id);
         }
         catch (e) {
-            if (e instanceof Erros_1.AcaoInexistenteError) {
+            if (e instanceof Erros_1.ContaInexistenteError) {
                 this._contas.push(conta);
             }
             else {
@@ -60,15 +60,27 @@ class Corretora {
             }
         }
     }
+    consultarConta(conta_id) {
+        let conta_procurada;
+        for (let i = 0; i < this._contas.length; i++) {
+            if (this._contas[i].id == conta_id) {
+                conta_procurada = this._contas[i];
+            }
+        }
+        if (!conta_procurada) {
+            throw new Erros_1.ContaInexistenteError("Conta inexistente, verifique o numero informado.");
+        }
+        return conta_procurada;
+    }
     //////////////////// FUNÇÕES DE AÇÃO CORRETORA ////////////////////
-    editarNomeAcao(ticket, novoNome) {
-        this.consultarAcaoTicket(ticket).nome_ativo = novoNome;
+    editarNomeAcao(id_ativo, novoNome) {
+        this.consultarAcaoId(id_ativo).nome_ativo = novoNome;
     }
-    editarPrecoAcao(ticket, novoPreco) {
-        this.consultarAcaoTicket(ticket).valor_ativo = novoPreco;
+    editarPrecoAcao(id_ativo, novoPreco) {
+        this.consultarAcaoId(id_ativo).valor_ativo = novoPreco;
     }
-    editarTicketAcao(ticket, novoTicket) {
-        this.consultarAcaoTicket(ticket).ticket = novoTicket;
+    editarTicketAcao(id_ativo, novoTicket) {
+        this.consultarAcaoId(id_ativo).ticket = novoTicket;
     }
     consultarAcao(id) {
         let acaoProcurada;
@@ -82,32 +94,32 @@ class Corretora {
         }
         return acaoProcurada;
     }
-    consultarAcaoTicket(ticket) {
+    consultarAcaoId(id_ativo) {
         let acaoProcurada;
         for (let i = 0; i < this._homeBroker.length; i++) {
-            if (this._homeBroker[i].ticket == ticket) {
+            if (this._homeBroker[i].id == id_ativo) {
                 acaoProcurada = this._homeBroker[i];
             }
         }
         if (!acaoProcurada) {
-            throw new Erros_1.AcaoInexistenteError("Ação inexistente, verifique o numero informado.");
+            throw new Erros_1.AcaoInexistenteError("Ação inexistente, verifique o Identificador informado.");
         }
         return acaoProcurada;
     }
-    consultarIndiceAcao(ticket) {
+    consultarIndiceAcao(id_ativo) {
         let indiceProcurado = -1;
         for (let i = 0; i < this._homeBroker.length; i++) {
-            if (this._homeBroker[i].ticket == ticket) {
+            if (this._homeBroker[i].id == id_ativo) {
                 indiceProcurado = i;
             }
         }
         if (indiceProcurado == -1) {
-            throw new Erros_1.AcaoInexistenteError("Ação Inexistente, Verifique o Ticket Informado.");
+            throw new Erros_1.AcaoInexistenteError("Ação Inexistente, Verifique o Identificador Informado.");
         }
         return indiceProcurado;
     }
-    excluirAcao(ticket) {
-        let indice = this.consultarIndiceAcao(ticket);
+    excluirAcao(id_ativo) {
+        let indice = this.consultarIndiceAcao(id_ativo);
         if (indice != -1) {
             for (var i = indice; i < this._homeBroker.length; i++) {
                 this._homeBroker[i] = this._homeBroker[i + 1];
@@ -116,22 +128,22 @@ class Corretora {
         }
     }
     //////////////////// FUNÇÕES DE TESOURO CORRETORA ////////////////////
-    editarNomeTesouro(nome, novo_nome) {
-        this.consultarTesouroNome(nome).nome_ativo = novo_nome;
+    editarNomeTesouro(id_ativo, novo_nome) {
+        this.consultarTesouroId(id_ativo).nome_ativo = novo_nome;
     }
-    editarValorTesouro(nome, novo_valor) {
-        this.consultarTesouroNome(nome).valor_ativo = novo_valor;
+    editarValorTesouro(id_ativo, novo_valor) {
+        this.consultarTesouroId(id_ativo).valor_ativo = novo_valor;
     }
-    editarVencimentoTesouro(nome, novo_vencimento) {
-        this.consultarTesouroNome(nome).data_vencimento = novo_vencimento;
+    editarVencimentoTesouro(id_ativo, novo_vencimento) {
+        this.consultarTesouroId(id_ativo).data_vencimento = novo_vencimento;
     }
-    editarRentabilidadeTesouro(nome, nova_renatabilidade_anual) {
-        this.consultarTesouroNome(nome).rentabilidade_anual = nova_renatabilidade_anual;
+    editarRentabilidadeTesouro(id_ativo, nova_renatabilidade_anual) {
+        this.consultarTesouroId(id_ativo).rentabilidade_anual = nova_renatabilidade_anual;
     }
-    consultarTesouroNome(nome) {
+    consultarTesouroId(id_ativo) {
         let tesouroProcurado;
         for (let i = 0; i < this._homeBrokerTesouro.length; i++) {
-            if (this._homeBrokerTesouro[i].nome_ativo == nome) {
+            if (this._homeBrokerTesouro[i].id == id_ativo) {
                 tesouroProcurado = this._homeBrokerTesouro[i];
             }
         }
@@ -140,10 +152,10 @@ class Corretora {
         }
         return tesouroProcurado;
     }
-    consultarIndiceTesouro(nome_ativo) {
+    consultarIndiceTesouro(id_ativo) {
         let indiceProcurado = -1;
         for (let i = 0; i < this._homeBrokerTesouro.length; i++) {
-            if (this._homeBrokerTesouro[i].nome_ativo == nome_ativo) {
+            if (this._homeBrokerTesouro[i].id == id_ativo) {
                 indiceProcurado = i;
             }
         }
@@ -152,8 +164,8 @@ class Corretora {
         }
         return indiceProcurado;
     }
-    excluirTesouro(nome) {
-        let indice = this.consultarIndiceTesouro(nome);
+    excluirTesouro(id_ativo) {
+        let indice = this.consultarIndiceTesouro(id_ativo);
         if (indice != -1) {
             for (var i = indice; i < this._homeBrokerTesouro.length; i++) {
                 this._homeBrokerTesouro[i] = this._homeBrokerTesouro[i + 1];
@@ -165,7 +177,8 @@ class Corretora {
         let listaStringContas = '';
         for (let i = 0; i < this._contas.length; i++) {
             listaStringContas = listaStringContas +
-                ' Nome: ' + this._contas[i].nome +
+                ' ID: ' + this._contas[i].id +
+                ' - Nome: ' + this._contas[i].nome +
                 ' - Saldo: ' + this._contas[i].saldo + '\n';
         }
         return listaStringContas;
@@ -175,12 +188,14 @@ class Corretora {
         let listaStringTesouro = '\nTESOURO:\n';
         for (let i = 0; i < this._homeBroker.length; i++) {
             listaStringAcoes = listaStringAcoes +
+                ' - ID: ' + this._homeBroker[i].id +
                 ' - Empresa: ' + this._homeBroker[i].nome_ativo +
                 ' - Ticket: ' + this._homeBroker[i].ticket +
                 ' - Valor: ' + this._homeBroker[i].valor_ativo + '\n';
         }
         for (let i = 0; i < this._homeBrokerTesouro.length; i++) {
             listaStringTesouro = listaStringTesouro +
+                ' - ID: ' + this._homeBrokerTesouro[i].id +
                 ' - Tesouro: ' + this._homeBrokerTesouro[i].nome_ativo +
                 ' - Valor: ' + this._homeBrokerTesouro[i].valor_ativo +
                 ' - Vencimento: ' + this._homeBrokerTesouro[i].data_vencimento +
@@ -192,10 +207,10 @@ class Corretora {
         let listaStrings = '';
         let listaStringsContas = '';
         for (let i = 0; i < this._homeBroker.length; i++) {
-            listaStrings = listaStrings + 'A;' + this._homeBroker[i].nome_ativo + ';' + this._homeBroker[i].ticket + ';' + this._homeBroker[i].valor_ativo + '\n';
+            listaStrings = listaStrings + this._homeBroker[i].id + ';A;' + this._homeBroker[i].nome_ativo + ';' + this._homeBroker[i].ticket + ';' + this._homeBroker[i].valor_ativo + '\n';
         }
         for (let i = 0; i < this._homeBrokerTesouro.length; i++) {
-            listaStrings = listaStrings + 'T;' + this._homeBrokerTesouro[i].nome_ativo + ';' + this._homeBrokerTesouro[i].valor_ativo + ';' + this._homeBrokerTesouro[i].data_vencimento + ';' + this._homeBrokerTesouro[i].rentabilidade_anual + '\n';
+            listaStrings = listaStrings + this._homeBrokerTesouro[i].id + ';T;' + this._homeBrokerTesouro[i].nome_ativo + ';' + this._homeBrokerTesouro[i].valor_ativo + ';' + this._homeBrokerTesouro[i].data_vencimento + ';' + this._homeBrokerTesouro[i].rentabilidade_anual + '\n';
         }
         var ativos = require('fs');
         ativos.writeFile('ativos.txt', listaStrings, function (err) {
@@ -203,7 +218,7 @@ class Corretora {
                 throw err;
         });
         for (let i = 0; i < this._contas.length; i++) {
-            listaStringsContas = listaStringsContas + this._contas[i].nome + ';' + this._contas[i].saldo + ';' + this._contas[i].senha + '\n';
+            listaStringsContas = listaStringsContas + this._contas[i].id + ';' + this._contas[i].nome + ';' + this._contas[i].saldo + ';' + this._contas[i].senha + '\n';
         }
         var contas = require('fs');
         contas.writeFile('contas.txt', listaStringsContas, function (err) {

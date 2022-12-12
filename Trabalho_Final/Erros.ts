@@ -15,6 +15,11 @@ class AcaoInexistenteError extends AplicacaoError {
         super(msg)
     }
 }
+class ContaInexistenteError extends AplicacaoError {
+    constructor(msg: string) {
+        super(msg)
+    }
+}
 class AtivoInexistenteError extends AplicacaoError {
     constructor(msg: string) {
         super(msg)
@@ -38,4 +43,4 @@ class QuantidadeInsuficienteError extends AplicacaoError {
     }
 }
 
-export {AplicacaoError, ValorInvalidoError, AcaoInexistenteError, AcaoJaExistenteError, SaldoInsuficienteError, QuantidadeInsuficienteError,AtivoInexistenteError};
+export {AplicacaoError, ValorInvalidoError, AcaoInexistenteError, AcaoJaExistenteError, SaldoInsuficienteError, QuantidadeInsuficienteError,AtivoInexistenteError , ContaInexistenteError};

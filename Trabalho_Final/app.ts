@@ -49,6 +49,8 @@ do {
         case "4":
             cadastrarConta();
             break
+        default:
+            console.log('Opção Invalida, Tente Novamente!');
     }
 } while (opcao != "9");
 atualizarBancoDeDados();
@@ -84,6 +86,7 @@ function excluirAtivo() {
 
 function editarAtivo() {
     console.log("\nEditar Ativo\n");
+    listarAtivos();
     var tipo: string = input('Deseja Editar Ação (A) ou Tesouro Direto (T) - Digite A ou T: ').toLocaleUpperCase();
     if (tipo == 'A') {
         editarAcao();
@@ -99,37 +102,38 @@ function editarAtivo() {
 function cadastrarAcao() {
     console.log("\nCadastrar Ação\n");
     let acao!: Acao;
+    let id: string = input('Digite o ID: ').toLocaleUpperCase();
     let nome: string = input('Digite o Nome da Empresa: ').toLocaleUpperCase();
     let ticket: string = input('Digite o Ticket: ').toLocaleUpperCase();
     let valor: string = input('Digite o Valor: ');
-    acao = new Acao('0', nome, parseFloat(valor), ticket);
+    acao = new Acao(id, nome, parseFloat(valor), ticket);
     c.cadastrarAcao(acao);
 }
 
 function excluirAcao() {
     console.log("\nExcluir Ação\n");
-    let ticket: string = input('Digite o Ticket da ação:').toLocaleUpperCase();
-    c.excluirAcao(ticket);
+    let id_ativo: string = input('Digite o Identificador da ação:').toLocaleUpperCase();
+    c.excluirAcao(id_ativo);
 }
 
 function editarAcao() {
     console.log("\nEditar Ação\n");
-    let ticket_editar: string = input('Ticket da Ação: ').toLocaleUpperCase();
-    c.consultarAcaoTicket(ticket_editar);
+    let id_ativo: string = input('Digite Identificador da Ação: ').toLocaleUpperCase();
+    c.consultarAcaoId(id_ativo);
 
     let edicao: string = input('\n Escolha uma opção \n1 - Editar Nome | 2 - Editar Ticket | 3 - Editar Valor \n');
     switch (edicao) {
         case "1":
             let nome: string = input('\nNovo Nome: ').toLocaleUpperCase();
-            c.editarNomeAcao(ticket_editar, nome);
+            c.editarNomeAcao(id_ativo, nome);
             break;
         case "2":
             let ticket: string = input('\nNovo Ticket: ').toLocaleUpperCase();
-            c.editarTicketAcao(ticket_editar, ticket);
+            c.editarTicketAcao(id_ativo, ticket);
             break;
         case "3":
             let valor: string = input('\nNovo Valor: ');
-            c.editarPrecoAcao(ticket_editar, parseFloat(valor));
+            c.editarPrecoAcao(id_ativo, parseFloat(valor));
             break;
         default:
             console.log("\nOpção Invalida\n");
@@ -141,26 +145,28 @@ function editarAcao() {
 function cadastrarTesouro() {
     console.log("\nCadastrar Tesouro Direto\n");
     var tesouro!: TesouroDireto;
+    var id: string = input('Digite o ID do Tesuro: ').toLocaleUpperCase();
     var nome: string = input('Digite o Nome do Tesuro: ').toLocaleUpperCase();
     var vencimento: string = input('Digite a Data de vencimento DD/MM/AAAA: ');
     var valor_unitario: string = input('Digite o Valor Unitario: ');
     var taxa_retorno: string = input('Digite a Taxa de Retorno: ');
-    tesouro = new TesouroDireto('0', nome, parseFloat(valor_unitario), vencimento, taxa_retorno);
+    tesouro = new TesouroDireto(id, nome, parseFloat(valor_unitario), vencimento, taxa_retorno);
     c.cadastrarTesouro(tesouro);
 }
 
 function excluirTesouro() {
     console.log("\nExcluir Tesouro\n");
-    let nome_tesouro: string = input('Digite o Nome do Tesouro:').toLocaleUpperCase();
-    c.excluirTesouro(nome_tesouro);
+    let id_ativo: string = input('Digite o Identificador do Tesouro:').toLocaleUpperCase();
+    c.excluirTesouro(id_ativo);
 }
 
 function editarTesouro() {
     console.log("\nEditar Tesouro\n");
-    let tesouro_editar: string = input('Nome do Tesouro: ').toLocaleUpperCase();
-    c.consultarTesouroNome(tesouro_editar);
+    let tesouro_editar: string = input('Digite o Identificador Tesouro: ').toLocaleUpperCase();
+    c.consultarTesouroId(tesouro_editar);
 
     let edicao: string = input('\n Escolha uma opção \n1 - Editar Nome | 2 - Editar Valor | 3 - Editar Vencimento | 4 - Editar Rentabilidade \n');
+
     switch (edicao) {
         case "1":
             let nome: string = input('\nNovo Nome: ').toLocaleUpperCase();
@@ -206,7 +212,7 @@ function login() {
                     operarAtivo(usuario.nome, 'VENDER');
                     break;
                 case "3":
-                    consultarAtivos();
+                    listarAtivos();
                     break;
                 case "4":
                     verCarteira(usuario.nome);
@@ -218,37 +224,40 @@ function login() {
     }    
 }
 
+  
+
+    //////////////////// FUNÇÕES DE AÇÃO INVESTIDOR ////////////////////
     function verCarteira(usuario_nome: string) {
         console.log("\n ------ Ver Carteira ------");
         console.log(usuario.verCarteira(usuario_nome));
     }
 
-    //////////////////// FUNÇÕES DE AÇÃO INVESTIDOR ////////////////////
     function operarAtivo(usuario_nome: string, tipo_operacao: string): void {
         listarAtivos();
         console.log("\nOperar Ativo\n");
         var tipo_ativo: string = input('Deseja Operar Ação (A) ou Tesouro Direto (T) - Digite A ou T: ').toLocaleUpperCase();
-        let nome_ativo: string = input('Digite o Identificador do Ativo: ').toLocaleUpperCase();
-        let quantidade_acoes: string = input('Digite a Quantidade: ');
-        let ativo_comprado = new AtivoComprado(usuario_nome, nome_ativo, parseInt(quantidade_acoes), tipo_ativo);
+        let id_ativo: string = input('Digite o Identificador do Ativo: ').toLocaleUpperCase();
+        
         let info;
 
         if (tipo_ativo == 'A'){
-            info = c.consultarAcaoTicket(nome_ativo);
+            info = c.consultarAcaoId(id_ativo);
         } else if (tipo_ativo == 'T') {
-            info = c.consultarTesouroNome(nome_ativo);
+            info = c.consultarAcaoId(id_ativo);
         } else {
             console.log("\nOpção Invalida - Digite A ou T\n");
             operarAtivo(usuario_nome, tipo_operacao)
         }
+
+        let quantidade_acoes: string = input('Digite a Quantidade: ');
+        let ativo_comprado = new AtivoComprado(id_ativo, usuario_nome, info.nome_ativo, parseInt(quantidade_acoes), tipo_ativo);
 
         let valor_total = (info.valor_ativo * parseFloat(quantidade_acoes));
     
         usuario.operarAtivo(ativo_comprado, valor_total, tipo_operacao);
         console.log('Operação Realizada com Sucesso!\nSaldo Atual: R$ ' + usuario.saldo);
     }
-    
-    //////////////////// FUNÇÕES SISTEMA ////////////////////
+
     function listarContas(){
         console.log('---- Ver Investidores ----');
         console.log(c.listarContas())   
@@ -257,7 +266,8 @@ function login() {
         console.log('---- Ver Ativos ----');
         console.log(c.listarAtivos())   
     }
-
+    
+    //////////////////// FUNÇÕES SISTEMA ////////////////////
     function atualizarBancoDeDados() {
         c.atualizarBancoDeDados();
         if (usuario != null){
@@ -266,10 +276,11 @@ function login() {
     }
 
     function cadastrarConta() {
+        let id: string = input('ID: ').toLocaleUpperCase();
         let nome: string = input('Nome: ').toLocaleUpperCase();
         let senha: string = input('Senha: ').toLocaleUpperCase();
         let saldo: string = input('Saldo Inicial: ').toLocaleUpperCase();
-        let conta = new Investidor(nome, senha, parseFloat(saldo));
+        let conta = new Investidor(id, nome, senha, parseFloat(saldo));
         c.cadastrarConta(conta);
     }
 
@@ -281,24 +292,25 @@ function login() {
             let linha: string = lrs.readline();
             if (linha != null) {
                 let array: string[] = linha.split(";");
-                let tipo: string = array[0];
-                let nome: string = array[1];
+                let id: string = array[0];
+                let tipo: string = array[1];
+                let nome: string = array[2];
 
                 let acao!: Acao;
                 let tesouro!: TesouroDireto;
 
                 if (tipo == 'A') {
-                    let ticket: string = array[2];
-                    let valor: number = parseFloat(array[3]);
-                    acao = new Acao("0", nome, valor, ticket);
+                    let ticket: string = array[3];
+                    let valor: number = parseFloat(array[4]);
+                    acao = new Acao(id, nome, valor, ticket);
                     c.cadastrarAcao(acao);
                     console.log('Ação lida: ' + acao.nome_ativo);
 
                 } else if (tipo == 'T') {
-                    let valor: number = parseFloat(array[2]);
-                    let vencimento: string = array[3];
-                    let rentabilidade_anual: string = array[4];
-                    tesouro = new TesouroDireto("0", nome, valor, vencimento, rentabilidade_anual);
+                    let valor: number = parseFloat(array[3]);
+                    let vencimento: string = array[4];
+                    let rentabilidade_anual: string = array[5];
+                    tesouro = new TesouroDireto(id, nome, valor, vencimento, rentabilidade_anual);
                     c.cadastrarTesouro(tesouro);
                     console.log('Tesouro lido: ' + tesouro.nome_ativo);
                 }
@@ -311,17 +323,16 @@ function login() {
 
     function carregarContas() {
         let LineReaderSync = require("line-reader-sync");
-        let ativo_comprado!: AtivoComprado;
         let contas = new LineReaderSync("./contas.txt");
         while (true) {
             let conta_bd: string = contas.readline();
             if (conta_bd != null) {
                 let array: string[] = conta_bd.split(";");
-                let nome_conta: string = array[0].toUpperCase();
-                let saldo: number = parseFloat(array[1]);
-                let senha: string = array[2];
-                ativo_comprado = new AtivoComprado(nome_conta, 'AAAA', 0, '');
-                let conta: Investidor = new Investidor(nome_conta, senha, saldo);
+                let id_conta: string = array[0].toUpperCase();
+                let nome_conta: string = array[1].toUpperCase();
+                let saldo: number = parseFloat(array[2]);
+                let senha: string = array[3].toUpperCase();
+                let conta: Investidor = new Investidor(id_conta, nome_conta, senha, saldo);
                 c.cadastrarConta(conta);
                 console.log('Conta Lida: ' + conta.nome);
             } else {
@@ -351,12 +362,13 @@ function login() {
             let carteira: string = carteiras.readline();
             if (carteira != null) {
                 let array: string[] = carteira.split(";");
-                let nome_conta: string = array[0].toUpperCase();
-                let ticket: string = array[1];
-                let quantidade: number = parseFloat(array[2]);
-                let tipo: string = array[3].toUpperCase();
+                let id_ativo: string = array[0].toUpperCase();
+                let nome_conta: string = array[1].toUpperCase();
+                let ticket: string = array[2];
+                let quantidade: number = parseFloat(array[3]);
+                let tipo: string = array[4].toUpperCase();
 
-                let ativo_comprado = new AtivoComprado(nome_conta, ticket, quantidade, tipo);
+                let ativo_comprado = new AtivoComprado(id_ativo, nome_conta, ticket, quantidade, tipo);
                 usuario.carregarAtivo(ativo_comprado);
             } else {
                 console.log('CARTEIRA CARREGADA: ' + nome_conta);

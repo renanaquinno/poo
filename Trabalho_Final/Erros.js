@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AtivoInexistenteError = exports.QuantidadeInsuficienteError = exports.SaldoInsuficienteError = exports.AcaoJaExistenteError = exports.AcaoInexistenteError = exports.ValorInvalidoError = exports.AplicacaoError = void 0;
+exports.ContaInexistenteError = exports.AtivoInexistenteError = exports.QuantidadeInsuficienteError = exports.SaldoInsuficienteError = exports.AcaoJaExistenteError = exports.AcaoInexistenteError = exports.ValorInvalidoError = exports.AplicacaoError = void 0;
 class AplicacaoError extends Error {
     constructor(msg) {
         super(msg);
@@ -19,6 +19,12 @@ class AcaoInexistenteError extends AplicacaoError {
     }
 }
 exports.AcaoInexistenteError = AcaoInexistenteError;
+class ContaInexistenteError extends AplicacaoError {
+    constructor(msg) {
+        super(msg);
+    }
+}
+exports.ContaInexistenteError = ContaInexistenteError;
 class AtivoInexistenteError extends AplicacaoError {
     constructor(msg) {
         super(msg);
