@@ -229,7 +229,7 @@ function operarAtivo(usuario_nome, tipo_operacao) {
         info = c.consultarAcaoId(id_ativo);
     }
     else if (tipo_ativo == 'T') {
-        info = c.consultarAcaoId(id_ativo);
+        info = c.consultarTesouroId(id_ativo);
     }
     else {
         console.log("\nOpção Invalida - Digite A ou T\n");
