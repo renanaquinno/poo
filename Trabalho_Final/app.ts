@@ -6,6 +6,7 @@ import { Investidor } from "./Conta";
 import { AtivoComprado } from "./AtivoComprado";
 
 const input = prompt();
+const clc = require('cli-color');
 
 var c: Corretora = new Corretora();
 let usuario!: Investidor;
@@ -163,7 +164,11 @@ function excluirTesouro() {
 function editarTesouro() {
     console.log("\nEditar Tesouro\n");
     let tesouro_editar: string = input('Digite o Identificador Tesouro: ').toLocaleUpperCase();
-    c.consultarTesouroId(tesouro_editar);
+    try {
+        c.consultarTesouroId(tesouro_editar);
+    }   catch(e: any) {
+        console.log(clc.red(e.message));
+    }
 
     let edicao: string = input('\n Escolha uma opção \n1 - Editar Nome | 2 - Editar Valor | 3 - Editar Vencimento | 4 - Editar Rentabilidade \n');
 
