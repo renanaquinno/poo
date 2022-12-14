@@ -1,7 +1,9 @@
 import { Acao } from "./Acao";
-import { AcaoInexistenteError, ContaInexistenteError } from "./Erros";
+import { AcaoInexistenteError, ContaInexistenteError, AcaoJaExistenteError } from "./Erros";
 import { TesouroDireto } from "./TesouroDireto";
 import { Investidor } from "./Conta";
+import { sign } from "crypto";
+const clc = require('cli-color');
 
 class Corretora {
     private _homeBroker: Acao[] = [];
@@ -11,27 +13,37 @@ class Corretora {
     //////////////////// FUNÇÕES DE ATIVOS CORRETORA ////////////////////
     fazerLogin(nome: string, senha: string){
         let conta_procurada!: Investidor;
-        for (let i = 0; i < this._contas.length; i++) {
-            if (this._contas[i].nome == nome && this._contas[i].senha == senha) {
-                conta_procurada = this._contas[i];
+        try {
+            for (let i = 0; i < this._contas.length; i++) {
+                if (this._contas[i].nome == nome && this._contas[i].senha == senha) {
+                    conta_procurada = this._contas[i];
+                }
             }
+            if (!conta_procurada) {
+                throw new AcaoInexistenteError("Erro de Login.")
+            }
+            return conta_procurada;
+        }   catch(e: any) {
+            console.log(clc.red(e.message));
         }
-        if (!conta_procurada) {
-            throw new AcaoInexistenteError("Erro de Login.")
-        }
-        return conta_procurada;
     }
 
     cadastrarAcao(acao: Acao) {
+        let sucesso = false;
         try {
             this.consultarAcaoId(acao.id);
         } catch (e: any) {
             if (e instanceof AcaoInexistenteError) {
                 this._homeBroker.push(acao)
-            } else {
-                console.log("Ação já existe.")
+                sucesso = true;
+            } 
+
+            if (e instanceof AcaoJaExistenteError) {
+                console.log(clc.red(e.message));
             }
         }
+
+        return sucesso;
     }
 
     cadastrarTesouro(tesouro: TesouroDireto) {
@@ -47,15 +59,18 @@ class Corretora {
     }
 
     cadastrarConta(conta: Investidor) {
+        let sucesso = false;
         try {
             this.consultarConta(conta.id);
         } catch (e: any) {
             if (e instanceof ContaInexistenteError) {
                 this._contas.push(conta)
+                sucesso = true;
             } else {
                 console.log("Conta já existe.")
             }
         }
+        return sucesso;
     }
 
     consultarConta(conta_id: string): Investidor{
@@ -159,7 +174,7 @@ class Corretora {
             }
         }
         if (!tesouroProcurado) {
-            throw new AcaoInexistenteError("Tesouro inexistente, verifique o nome informado.")
+            throw new AcaoInexistenteError("Tesouro inexistente, verifique o ID informado.")
         }
         return tesouroProcurado;
     }
