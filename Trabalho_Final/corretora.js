@@ -1,4 +1,5 @@
 "use strict";
+const clc = require('cli-color');
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Corretora = void 0;
 const Erros_1 = require("./Erros");
@@ -11,54 +12,69 @@ class Corretora {
     //////////////////// FUNÇÕES DE ATIVOS CORRETORA ////////////////////
     fazerLogin(nome, senha) {
         let conta_procurada;
-        for (let i = 0; i < this._contas.length; i++) {
-            if (this._contas[i].nome == nome && this._contas[i].senha == senha) {
-                conta_procurada = this._contas[i];
+        try {
+            for (let i = 0; i < this._contas.length; i++) {
+                if (this._contas[i].nome == nome && this._contas[i].senha == senha) {
+                    conta_procurada = this._contas[i];
+                }
             }
+            if (!conta_procurada) {
+                throw new Erros_1.AcaoInexistenteError("Usuário e/ou senha incorretos");
+            }
+            return conta_procurada;
+        }   catch (e) {
+                console.log(clc.red(e.message));
         }
-        if (!conta_procurada) {
-            throw new Erros_1.AcaoInexistenteError("Erro de Login.");
-        }
-        return conta_procurada;
     }
     cadastrarAcao(acao) {
+        let sucesso = false;
         try {
             this.consultarAcaoId(acao.id);
         }
         catch (e) {
             if (e instanceof Erros_1.AcaoInexistenteError) {
                 this._homeBroker.push(acao);
+                sucesso = true;
             }
-            else {
-                console.log("Ação já existe.");
+            if (e instanceof Erros_1.AcaoJaExistenteError) {
+                console.log(clc.red(e.message));
             }
         }
+
+        return sucesso;
     }
     cadastrarTesouro(tesouro) {
+        let sucesso = false;
         try {
             this.consultarTesouroId(tesouro.id);
         }
         catch (e) {
             if (e instanceof Erros_1.AcaoInexistenteError) {
                 this._homeBrokerTesouro.push(tesouro);
+                sucesso = true;
             }
             else {
-                console.log("Tesouro já existe.");
+                console.log(clc.red("O Tesouro Direto já existe no sistema, verifique o ID informado."));
             }
         }
+
+        return sucesso;
     }
     cadastrarConta(conta) {
+        let sucesso = false;
         try {
-            this.consultarConta(conta.id);
+            this.consultarContaId(conta.id);
         }
         catch (e) {
             if (e instanceof Erros_1.ContaInexistenteError) {
                 this._contas.push(conta);
-            }
-            else {
-                console.log("Conta já existe.");
+                sucesso = true;
+            }   else {
+                console.log(clc.red('Usuário já existe no sistema, verifique o ID informado.'));
             }
         }
+
+        return sucesso;
     }
     consultarConta(conta_id) {
         let conta_procurada;
@@ -68,19 +84,40 @@ class Corretora {
             }
         }
         if (!conta_procurada) {
-            throw new Erros_1.ContaInexistenteError("Conta inexistente, verifique o numero informado.");
+            throw new Erros_1.ContaInexistenteError("Conta inexistente, verifique o ID informado.");
+        }
+        return conta_procurada;
+    }
+
+    consultarContaId(conta_id) {
+        let conta_procurada;
+        for (let i = 0; i < this._contas.length; i++) {
+            if (this._contas[i].id == conta_id) {
+                conta_procurada = this._contas[i];
+                throw new Erros_1.ContaExistenteError("Conta já existente no sistema, verifique o ID informado.");
+            }
+        }
+        if (!conta_procurada) {
+            throw new Erros_1.ContaInexistenteError("Conta inexistente, verifique o ID informado.");
         }
         return conta_procurada;
     }
     //////////////////// FUNÇÕES DE AÇÃO CORRETORA ////////////////////
     editarNomeAcao(id_ativo, novoNome) {
-        this.consultarAcaoId(id_ativo).nome_ativo = novoNome;
+        try {
+            this.consultarAcao(id_ativo).nome_ativo = novoNome;
+        }   catch(e) {
+            console.log(e.message);
+        }
+        console.log(clc.green('Nome editado com sucesso!'));
     }
     editarPrecoAcao(id_ativo, novoPreco) {
-        this.consultarAcaoId(id_ativo).valor_ativo = novoPreco;
+        this.consultarAcao(id_ativo).valor_ativo = novoPreco;
+        console.log(clc.green('Preço editado com sucesso!'));
     }
     editarTicketAcao(id_ativo, novoTicket) {
-        this.consultarAcaoId(id_ativo).ticket = novoTicket;
+        this.consultarAcao(id_ativo).ticket = novoTicket;
+        console.log(clc.green('Ticket editado com sucesso!'));
     }
     consultarAcao(id) {
         let acaoProcurada;
@@ -90,7 +127,7 @@ class Corretora {
             }
         }
         if (!acaoProcurada) {
-            throw new Erros_1.AcaoInexistenteError("Ação inexistente, verifique o numero informado.");
+            throw new Erros_1.AcaoInexistenteError("Ação inexistente, verifique o ID informado.");
         }
         return acaoProcurada;
     }
@@ -99,10 +136,11 @@ class Corretora {
         for (let i = 0; i < this._homeBroker.length; i++) {
             if (this._homeBroker[i].id == id_ativo) {
                 acaoProcurada = this._homeBroker[i];
+                throw new Erros_1.AcaoJaExistenteError("Ação já existente no sistema, verifique o ID informado.");
             }
         }
         if (!acaoProcurada) {
-            throw new Erros_1.AcaoInexistenteError("Ação inexistente, verifique o Identificador informado.");
+            throw new Erros_1.AcaoInexistenteError("Ação inexistente, verifique o ID informado.");
         }
         return acaoProcurada;
     }
@@ -114,17 +152,27 @@ class Corretora {
             }
         }
         if (indiceProcurado == -1) {
-            throw new Erros_1.AcaoInexistenteError("Ação Inexistente, Verifique o Identificador Informado.");
+            throw new Erros_1.AcaoInexistenteError("Ação Inexistente, verifique o ID informado.");
         }
         return indiceProcurado;
     }
     excluirAcao(id_ativo) {
-        let indice = this.consultarIndiceAcao(id_ativo);
-        if (indice != -1) {
-            for (var i = indice; i < this._homeBroker.length; i++) {
-                this._homeBroker[i] = this._homeBroker[i + 1];
+        let sucesso = false;
+        try {
+            let indice = this.consultarIndiceAcao(id_ativo);
+            if (indice != -1) {
+                for (var i = indice; i < this._homeBroker.length; i++) {
+                    this._homeBroker[i] = this._homeBroker[i + 1];
+                }
+                this._homeBroker.pop();
+                sucesso = true;
             }
-            this._homeBroker.pop();
+        }   catch(e) {
+            console.log(clc.red(e.message));
+        }
+
+        if (sucesso === true) {
+            console.log(clc.green('Ativo excluído com sucesso!'));
         }
     }
     //////////////////// FUNÇÕES DE TESOURO CORRETORA ////////////////////
@@ -145,10 +193,11 @@ class Corretora {
         for (let i = 0; i < this._homeBrokerTesouro.length; i++) {
             if (this._homeBrokerTesouro[i].id == id_ativo) {
                 tesouroProcurado = this._homeBrokerTesouro[i];
+           //     throw new Erros_1.AtivoExistenteError("Tesouro J, verifique o nome informado.");
             }
         }
         if (!tesouroProcurado) {
-            throw new Erros_1.AcaoInexistenteError("Tesouro inexistente, verifique o nome informado.");
+            throw new Erros_1.AcaoInexistenteError("Tesouro inexistente, verifique o ID informado.");
         }
         return tesouroProcurado;
     }
@@ -160,20 +209,34 @@ class Corretora {
             }
         }
         if (indiceProcurado == -1) {
-            throw new Erros_1.AcaoInexistenteError("Tesouro Inexistente, Verifique o Nome Informado.");
+            throw new Erros_1.AcaoInexistenteError("Tesouro Inexistente, verifique o ID informado.");
         }
         return indiceProcurado;
     }
     excluirTesouro(id_ativo) {
-        let indice = this.consultarIndiceTesouro(id_ativo);
-        if (indice != -1) {
-            for (var i = indice; i < this._homeBrokerTesouro.length; i++) {
-                this._homeBrokerTesouro[i] = this._homeBrokerTesouro[i + 1];
+        let sucesso = false;
+        try {
+            let indice = this.consultarIndiceTesouro(id_ativo);
+            if (indice != -1) {
+                for (var i = indice; i < this._homeBrokerTesouro.length; i++) {
+                    this._homeBrokerTesouro[i] = this._homeBrokerTesouro[i + 1];
+                }
+                this._homeBrokerTesouro.pop();
+                sucesso = true;
             }
-            this._homeBrokerTesouro.pop();
+        }   catch(e) {
+            console.log(clc.red(e.message));
+        }
+
+        if (sucesso === true) {
+            console.log(clc.green('Ativo excluído com sucesso!'));
         }
     }
+
     listarContas() {
+        console.log(clc.green('\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='));
+        console.log(clc.green('                      LISTA DE USUÁRIOS                            '));
+        console.log(clc.green('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='));
         let listaStringContas = '';
         for (let i = 0; i < this._contas.length; i++) {
             listaStringContas = listaStringContas +
