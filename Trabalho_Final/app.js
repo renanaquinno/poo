@@ -2,6 +2,7 @@
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+const clc = require('cli-color');
 Object.defineProperty(exports, "__esModule", { value: true });
 const prompt_sync_1 = __importDefault(require("prompt-sync"));
 const corretora_1 = require("./corretora");
@@ -16,14 +17,19 @@ carregarAtivos();
 carregarContas();
 let opcao = '';
 do {
-    console.log('\nEntrar no Sistema \nDigite uma opção:');
+    console.log(clc.green('\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='));
+    console.log(clc.green('                      PAINEL DO ADMINISTRADOR                              '));
+    console.log(clc.green('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='));
+    console.log(clc.green('\nDigite uma opção:'));
     console.log('1 - Gerenciar Ativos  2 - Entrar como Investidor  4 - Cadastrar Investidor - 3 Ver Investidores 9 - Sair\n');
     opcao = input("Opção:");
     switch (opcao) {
         case "1":
             do {
-                console.log('\nBem vindo ao Sistema de Gerenciamento de Ativos - Menu Gerenciar\nDigite uma opção:');
-                console.log('1 - Cadastrar Ativo    2 - Editar Ativo   3 - Excluir Ativo  4 - Consultar Ativos  0 - Sair\n');
+                console.log(clc.green('\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='));
+                console.log(clc.green('                      GERENCIADOR DE ATIVOS                              '));
+                console.log(clc.green('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='));
+                console.log(('1 - Cadastrar Ativo    2 - Editar Ativo   3 - Excluir Ativo  4 - Consultar Ativos  0 - Sair\n'));
                 opcao = input("Opção:");
                 switch (opcao) {
                     case "1":
@@ -42,6 +48,9 @@ do {
             } while (opcao != "0");
             break;
         case "2":
+            console.log(clc.green('\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='));
+            console.log(clc.green('                             LOGIN                              '));
+            console.log(clc.green('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='));            
             login();
             break;
         case "3":
@@ -58,7 +67,9 @@ atualizarBancoDeDados();
 input('Operação finalizada. Pressione <enter>');
 //////////////////// FUNÇÕES DE ATIVOS CORRETORA ////////////////////
 function cadastrarAtivo() {
-    console.log("\nCadastrar Ativo\n");
+    console.log(clc.green('\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='));
+    console.log(clc.green('                      CADASTRO DE ATIVOS                              '));
+    console.log(clc.green('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='));
     let tipo = input('Deseja Cadastrar Ação (A) ou Tesouro Direto (T) - Digite A ou T: ').toLocaleUpperCase();
     if (tipo == 'A') {
         cadastrarAcao();
@@ -72,7 +83,7 @@ function cadastrarAtivo() {
     }
 }
 function excluirAtivo() {
-    console.log("\nExcluir Ativo\n");
+    console.log(clc.green("\nExcluir Ativo..."));
     var tipo = input('Deseja Excluir Ação (A) ou Tesouro Direto (T) - Digite A ou T: ').toLocaleUpperCase();
     if (tipo == 'A') {
         excluirAcao();
@@ -86,7 +97,7 @@ function excluirAtivo() {
     }
 }
 function editarAtivo() {
-    console.log("\nEditar Ativo\n");
+    console.log(clc.green("\nEditar Ativo..."));
     listarAtivos();
     var tipo = input('Deseja Editar Ação (A) ou Tesouro Direto (T) - Digite A ou T: ').toLocaleUpperCase();
     if (tipo == 'A') {
@@ -102,46 +113,55 @@ function editarAtivo() {
 }
 //////////////////// FUNÇÕES DE AÇÕES CORRETORA ////////////////////
 function cadastrarAcao() {
-    console.log("\nCadastrar Ação\n");
+    console.log(clc.green('\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='));
+    console.log(clc.green('                      CADASTRO DE AÇÕES                              '));
+    console.log(clc.green('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='));
     let acao;
     let id = input('Digite o ID: ').toLocaleUpperCase();
     let nome = input('Digite o Nome da Empresa: ').toLocaleUpperCase();
     let ticket = input('Digite o Ticket: ').toLocaleUpperCase();
     let valor = input('Digite o Valor: ');
     acao = new Acao_1.Acao(id, nome, parseFloat(valor), ticket);
-    c.cadastrarAcao(acao);
+    if(c.cadastrarAcao(acao)) {
+        console.log(clc.green('Ação cadastrada com sucesso!'));
+    }
 }
+
 function excluirAcao() {
-    console.log("\nExcluir Ação\n");
+    console.log(clc.green("\nExcluir Ação..."));
     let id_ativo = input('Digite o Identificador da ação:').toLocaleUpperCase();
     c.excluirAcao(id_ativo);
 }
 function editarAcao() {
-    console.log("\nEditar Ação\n");
+    console.log(clc.green("\nEditar Ação..."));
     let id_ativo = input('Digite Identificador da Ação: ').toLocaleUpperCase();
-    c.consultarAcaoId(id_ativo);
-    let edicao = input('\n Escolha uma opção \n1 - Editar Nome | 2 - Editar Ticket | 3 - Editar Valor \n');
-    switch (edicao) {
-        case "1":
-            let nome = input('\nNovo Nome: ').toLocaleUpperCase();
-            c.editarNomeAcao(id_ativo, nome);
-            break;
-        case "2":
-            let ticket = input('\nNovo Ticket: ').toLocaleUpperCase();
-            c.editarTicketAcao(id_ativo, ticket);
-            break;
-        case "3":
-            let valor = input('\nNovo Valor: ');
-            c.editarPrecoAcao(id_ativo, parseFloat(valor));
-            break;
-        default:
-            console.log("\nOpção Invalida\n");
-            editarAcao();
+    try {
+        c.consultarAcao(id_ativo);
+        let edicao = input('\n Escolha uma opção \n1 - Editar Nome | 2 - Editar Ticket | 3 - Editar Valor \n');
+        switch (edicao) {
+            case "1":
+                let nome = input('\nNovo Nome: ').toLocaleUpperCase();
+                c.editarNomeAcao(id_ativo, nome);
+                break;
+            case "2":
+                let ticket = input('\nNovo Ticket: ').toLocaleUpperCase();
+                c.editarTicketAcao(id_ativo, ticket);
+                break;
+            case "3":
+                let valor = input('\nNovo Valor: ');
+                c.editarPrecoAcao(id_ativo, parseFloat(valor));
+                break;
+            default:
+                console.log("\nOpção Invalida");
+                editarAcao();
+        }
+    }   catch(e) {
+        console.log(clc.red(e.message));
     }
 }
 //////////////////// FUNÇÕES DE TESOURO CORRETORA ////////////////////
 function cadastrarTesouro() {
-    console.log("\nCadastrar Tesouro Direto\n");
+    console.log(clc.green("\nCadastrar Tesouro Direto..."));
     var tesouro;
     var id = input('Digite o ID do Tesuro: ').toLocaleUpperCase();
     var nome = input('Digite o Nome do Tesuro: ').toLocaleUpperCase();
@@ -149,50 +169,57 @@ function cadastrarTesouro() {
     var valor_unitario = input('Digite o Valor Unitario: ');
     var taxa_retorno = input('Digite a Taxa de Retorno: ');
     tesouro = new TesouroDireto_1.TesouroDireto(id, nome, parseFloat(valor_unitario), vencimento, taxa_retorno);
-    c.cadastrarTesouro(tesouro);
+    if (c.cadastrarTesouro(tesouro)) {
+        console.log(clc.green('Tesouro Direto cadastrado com sucesso!'));
+    }   else {
+        console.log(clc.red('Tesouro Direto já existe no sistema!'));
+    }
 }
 function excluirTesouro() {
-    console.log("\nExcluir Tesouro\n");
+    console.log(clc.green("\nExcluir Tesouro..."));
     let id_ativo = input('Digite o Identificador do Tesouro:').toLocaleUpperCase();
     c.excluirTesouro(id_ativo);
 }
 function editarTesouro() {
-    console.log("\nEditar Tesouro\n");
+    console.log(clc.green("\nEditar Tesouro..."));
     let tesouro_editar = input('Digite o Identificador Tesouro: ').toLocaleUpperCase();
-    c.consultarTesouroId(tesouro_editar);
-    let edicao = input('\n Escolha uma opção \n1 - Editar Nome | 2 - Editar Valor | 3 - Editar Vencimento | 4 - Editar Rentabilidade \n');
-    switch (edicao) {
-        case "1":
-            let nome = input('\nNovo Nome: ').toLocaleUpperCase();
-            c.editarNomeTesouro(tesouro_editar, nome);
-            break;
-        case "2":
-            let valor = input('\nNovo Valor: ');
-            c.editarValorTesouro(tesouro_editar, parseFloat(valor));
-            break;
-        case "3":
-            let vencimento = input('\nNovo Vencimento: ');
-            c.editarVencimentoTesouro(tesouro_editar, vencimento);
-            break;
-        case "4":
-            let rentabilidade_anual = input('\nNova Rentabilidade Anual: ');
-            c.editarRentabilidadeTesouro(tesouro_editar, rentabilidade_anual);
-            break;
-        default:
-            console.log("\nOpção Invalida\n");
-            editarTesouro();
+    try {
+        c.consultarTesouroId(tesouro_editar);
+        let edicao = input('\n Escolha uma opção \n1 - Editar Nome | 2 - Editar Valor | 3 - Editar Vencimento | 4 - Editar Rentabilidade \n');
+        switch (edicao) {
+            case "1":
+                let nome = input('\nNovo Nome: ').toLocaleUpperCase();
+                c.editarNomeTesouro(tesouro_editar, nome);
+                break;
+            case "2":
+                let valor = input('\nNovo Valor: ');
+                c.editarValorTesouro(tesouro_editar, parseFloat(valor));
+                break;
+            case "3":
+                let vencimento = input('\nNovo Vencimento: ');
+                c.editarVencimentoTesouro(tesouro_editar, vencimento);
+                break;
+            case "4":
+                let rentabilidade_anual = input('\nNova Rentabilidade Anual: ');
+                c.editarRentabilidadeTesouro(tesouro_editar, rentabilidade_anual);
+                break;
+            default:
+                console.log("\nOpção Invalida");
+                editarTesouro();
+        }
+    }   catch(e) {
+        console.log(clc.red(e.message));
     }
 }
 //////////////////// FUNÇÕES DE ATIVOS INVESTIDOR ////////////////////
 function login() {
-    console.log("---- FAZER LOGIN ----");
     var user = input('Usuario: ').toLocaleUpperCase();
     var senha = input('Senha: ').toLocaleUpperCase();
     usuario = c.fazerLogin(user, senha);
     if (usuario != null) {
         carregarCarteirasuUsuario(usuario.nome);
         do {
-            console.log('\nBem vindo ao Sistema da Corretora - Menu Investidor\nDigite uma opção:');
+            console.log(clc.green('\nBem vindo ao Sistema da Corretora - Menu Investidor\nDigite uma opção:'));
             console.log('1 - Comprar Ativo\n2 - Vender Ativo\n3 - Consultar Ativos\n4 - Ver Carteira\n0 - Sair\n');
             opcao = input("Opção:");
             switch (opcao) {
@@ -216,7 +243,9 @@ function login() {
 }
 //////////////////// FUNÇÕES DE AÇÃO INVESTIDOR ////////////////////
 function verCarteira(usuario_nome) {
-    console.log("\n ------ Ver Carteira ------");
+    console.log(clc.green('\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='));
+    console.log(clc.green('                      CARTEIRA DO USUÁRIO                            '));
+    console.log(clc.green('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='));
     console.log(usuario.verCarteira(usuario_nome));
 }
 function operarAtivo(usuario_nome, tipo_operacao) {
@@ -225,28 +254,36 @@ function operarAtivo(usuario_nome, tipo_operacao) {
     var tipo_ativo = input('Deseja Operar Ação (A) ou Tesouro Direto (T) - Digite A ou T: ').toLocaleUpperCase();
     let id_ativo = input('Digite o Identificador do Ativo: ').toLocaleUpperCase();
     let info;
-    if (tipo_ativo == 'A') {
-        info = c.consultarAcaoId(id_ativo);
+    try {
+        if (tipo_ativo == 'A') {
+            info = c.consultarAcao(id_ativo);
+        }
+        else if (tipo_ativo == 'T') {
+            info = c.consultarTesouroId(id_ativo);
+        }
+        else {
+            console.log("\nOpção Invalida - Digite A ou T\n");
+            operarAtivo(usuario_nome, tipo_operacao);
+        }
+        let quantidade_acoes = input('Digite a Quantidade: ');
+        let ativo_comprado = new AtivoComprado_1.AtivoComprado(id_ativo, usuario_nome, info.nome_ativo, parseInt(quantidade_acoes), tipo_ativo);
+        let valor_total = (info.valor_ativo * parseFloat(quantidade_acoes));
+        usuario.operarAtivo(ativo_comprado, valor_total, tipo_operacao);
+        console.log(clc.green('Operação Realizada com Sucesso!'));
+        console.log('Saldo Atual: R$ ' + usuario.saldo);
+    }   catch (e) {
+            console.log(clc.red(e.message));
     }
-    else if (tipo_ativo == 'T') {
-        info = c.consultarTesouroId(id_ativo);
-    }
-    else {
-        console.log("\nOpção Invalida - Digite A ou T\n");
-        operarAtivo(usuario_nome, tipo_operacao);
-    }
-    let quantidade_acoes = input('Digite a Quantidade: ');
-    let ativo_comprado = new AtivoComprado_1.AtivoComprado(id_ativo, usuario_nome, info.nome_ativo, parseInt(quantidade_acoes), tipo_ativo);
-    let valor_total = (info.valor_ativo * parseFloat(quantidade_acoes));
-    usuario.operarAtivo(ativo_comprado, valor_total, tipo_operacao);
-    console.log('Operação Realizada com Sucesso!\nSaldo Atual: R$ ' + usuario.saldo);
 }
 function listarContas() {
-    console.log('---- Ver Investidores ----');
+//    console.log('---- Ver Investidores ----');
     console.log(c.listarContas());
 }
 function listarAtivos() {
-    console.log('---- Ver Ativos ----');
+//    console.log('---- Ver Ativos ----');
+console.log(clc.green('\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='));
+console.log(clc.green('                      LISTA DE ATIVOS                            '));
+console.log(clc.green('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='));
     console.log(c.listarAtivos());
 }
 //////////////////// FUNÇÕES SISTEMA ////////////////////
@@ -257,17 +294,25 @@ function atualizarBancoDeDados() {
     }
 }
 function cadastrarConta() {
+    console.log(clc.green('\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='));
+    console.log(clc.green('                      CADASTRAR USUÁRIO                             '));
+    console.log(clc.green('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='));
     let id = input('ID: ').toLocaleUpperCase();
     let nome = input('Nome: ').toLocaleUpperCase();
     let senha = input('Senha: ').toLocaleUpperCase();
     let saldo = input('Saldo Inicial: ').toLocaleUpperCase();
+    
     let conta = new Conta_1.Investidor(id, nome, senha, parseFloat(saldo));
-    c.cadastrarConta(conta);
+
+    if (c.cadastrarConta(conta)) {
+        console.log(clc.green('Usuário cadastrado com sucesso!'));
+    }
+    
 }
 function carregarAtivos() {
     let LineReaderSync = require("line-reader-sync");
     let lrs = new LineReaderSync("./ativos.txt");
-    console.log("Iniciando Banco de Dados\n");
+//    console.log(clc.hide("Iniciando Banco de Dados\n"));
     while (true) {
         let linha = lrs.readline();
         if (linha != null) {
@@ -282,7 +327,9 @@ function carregarAtivos() {
                 let valor = parseFloat(array[4]);
                 acao = new Acao_1.Acao(id, nome, valor, ticket);
                 c.cadastrarAcao(acao);
-                console.log('Ação lida: ' + acao.nome_ativo);
+
+            //   console.log('Ação cadastrada');
+//                console.log('Ação lida: ' + acao.nome_ativo);
             }
             else if (tipo == 'T') {
                 let valor = parseFloat(array[3]);
@@ -290,14 +337,14 @@ function carregarAtivos() {
                 let rentabilidade_anual = array[5];
                 tesouro = new TesouroDireto_1.TesouroDireto(id, nome, valor, vencimento, rentabilidade_anual);
                 c.cadastrarTesouro(tesouro);
-                console.log('Tesouro lido: ' + tesouro.nome_ativo);
+//                console.log('Tesouro lido: ' + tesouro.nome_ativo);
             }
         }
         else {
             break;
         }
     }
-    console.log("---- ATIVOS CARREGADOS ----\n");
+//    console.log("---- ATIVOS CARREGADOS ----\n");
 }
 function carregarContas() {
     let LineReaderSync = require("line-reader-sync");
@@ -312,13 +359,13 @@ function carregarContas() {
             let senha = array[3].toUpperCase();
             let conta = new Conta_1.Investidor(id_conta, nome_conta, senha, saldo);
             c.cadastrarConta(conta);
-            console.log('Conta Lida: ' + conta.nome);
+//            console.log('Conta Lida: ' + conta.nome);
         }
         else {
             break;
         }
     }
-    console.log("---- CONTAS CARREGADAS ----\n");
+//    console.log("---- CONTAS CARREGADAS ----\n");
 }
 function carregarCarteirasuUsuario(nome_conta) {
     let LineReaderSync = require("line-reader-sync");
@@ -348,7 +395,7 @@ function carregarCarteirasuUsuario(nome_conta) {
             usuario.carregarAtivo(ativo_comprado);
         }
         else {
-            console.log('CARTEIRA CARREGADA: ' + nome_conta);
+ //           console.log('CARTEIRA CARREGADA: ' + nome_conta);
             break;
         }
     }
